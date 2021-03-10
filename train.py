@@ -62,7 +62,7 @@ train_loader = data.DataLoader(
     shuffle=True,
     batch_size=batch_size,
     collate_fn=custom_collate_permute,
-    num_workers=os.cpu_count(),
+    num_workers=0,
 )
 
 val_loader = data.DataLoader(
@@ -70,7 +70,7 @@ val_loader = data.DataLoader(
     shuffle=False,
     batch_size=batch_size,
     collate_fn=custom_collate,
-    num_workers=os.cpu_count(),
+    num_workers=0,
 )
 
 # Define the model and optimizer

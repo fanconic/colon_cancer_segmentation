@@ -1,0 +1,57 @@
+Sender: LSF System <lsfadmin@lo-s4-034>
+Subject: Job 14811085: <./run.sh> in cluster <leonhard> Done
+
+Job <./run.sh> was submitted from host <lo-login-02> by user <fanconic> in cluster <leonhard> at Wed Mar 10 23:26:40 2021
+Job was executed on host(s) <4*lo-s4-034>, in queue <gpu.24h>, as user <fanconic> in cluster <leonhard> at Wed Mar 10 23:27:02 2021
+</cluster/home/fanconic> was used as the home directory.
+</cluster/home/fanconic/ML4H_project1> was used as the working directory.
+Started at Wed Mar 10 23:27:02 2021
+Terminated at Wed Mar 10 23:27:16 2021
+Results reported at Wed Mar 10 23:27:16 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+./run.sh
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   11.71 sec.
+    Max Memory :                                 2180 MB
+    Average Memory :                             741.00 MB
+    Total Requested Memory :                     16384.00 MB
+    Delta Memory :                               14204.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                8
+    Run time :                                   28 sec.
+    Turnaround time :                            36 sec.
+
+The output (if any) follows:
+
+Standard Training.
+Number of files:  100
+description:   0%|          | 0/40 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "train.py", line 105, in <module>
+    output = model(x_train)
+  File "/cluster/home/fanconic/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/cluster/home/fanconic/ML4H_project1/src/model/unet.py", line 88, in forward
+    x8 = self.up_block1(x7, x6)
+  File "/cluster/home/fanconic/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/cluster/home/fanconic/ML4H_project1/src/model/unet.py", line 50, in forward
+    x1 = self.up(x1)
+  File "/cluster/home/fanconic/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 889, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/cluster/home/fanconic/.local/lib/python3.7/site-packages/torch/nn/modules/upsampling.py", line 141, in forward
+    return F.interpolate(input, self.size, self.scale_factor, self.mode, self.align_corners)
+  File "/cluster/home/fanconic/.local/lib/python3.7/site-packages/torch/nn/functional.py", line 3446, in interpolate
+    "align_corners option can only be set with the "
+ValueError: align_corners option can only be set with the interpolating modes: linear | bilinear | bicubic | trilinear
+
+Script completed!

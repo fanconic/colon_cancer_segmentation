@@ -39,7 +39,13 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 
 
 ## How to run on the Leonhard Cluster:
-`bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" ./run.sh`
+```
+module load eth_proxy python_gpu/3.7.4
+pip install --user nibabel
+pip install --user --upgrade torch
+pip install --user --upgrade trochvision
+bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" ./run.sh
+```
 
 ## Contributors
 - Claudio Fanconi - fanconic@ethz.ch
