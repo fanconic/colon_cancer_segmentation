@@ -5,7 +5,7 @@ import random
 import torch
 import torch.utils.data as data
 import itertools
-from src.util.utils import list_files
+from src.utils.utils import list_files
 
 
 class CustomDataLoader(data.Dataset):

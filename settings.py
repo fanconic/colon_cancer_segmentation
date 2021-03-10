@@ -10,10 +10,8 @@ if "COLAB_GPU" in os.environ:
     out_dir = "/content/drive/MyDrive/ML4H/"
     colab = True
 else:
-    data_path = "/scratch/ML4H/ml4h_proj1_colon_cancer_ct/"
-    out_dir = os.path.join("/cluster/scratch/", username, "/ML4H/saved_models/")
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    data_path = "/cluster/scratch/{}/ML4H/ml4h_proj1_colon_cancer_ct/".format(username)
+    out_dir = "/cluster/scratch/{}/ML4H/saved_models/".format(username)
     colab = False
 
 model_dir = os.path.join(out_dir, experiment_run)
@@ -26,8 +24,8 @@ train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "imagesTr")
 test_dir = os.path.join(data_path, "imagesTs")
 
-num_epochs = 25
-batch_size = 3
+num_epochs = 50
+batch_size = 2
 img_size = 256
 learning_rate = 1e-3
 

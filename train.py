@@ -22,6 +22,8 @@ from settings import (
 from src.data.preprocessing import resize
 from src.model.unet import UNet
 import src
+from src.model.losses import DiceLoss
+from src.model.metrics import IoU
 
 # Prepare Data Generator
 full_dataset = CustomDataLoader(
@@ -77,8 +79,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Training Loop
 # from engine import evaluate
-criterion = src.model.losses.DiceLoss()
-accuracy_metric = src.model.metrics.IoU()
+criterion = DiceLoss()
+accuracy_metric = IoU()
 valid_loss_min = np.Inf
 
 
