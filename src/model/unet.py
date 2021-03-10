@@ -43,7 +43,7 @@ class down_conv(nn.Module):
 class up_sample(nn.Module):
     def __init__(self, in_channel, out_channel):
         super(up_sample, self).__init__()
-        self.up = nn.Upsample(scale_factor=2, mode="nearest", align_corners=True)
+        self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
         self.double_conv = double_conv(in_channel, out_channel)
 
     def forward(self, x1, x2):
