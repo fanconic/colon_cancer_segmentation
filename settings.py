@@ -33,4 +33,4 @@ learning_rate = 1e-3
 
 skip_empty = True
 input_channels = 1
-input_channels = 1
+output_channels = 1
