@@ -1,4 +1,4 @@
-# Cancer Segmentionion - ML4H Project1
+# Cancer Segmentation - ML4H Project1
 Project 1 one the course Machine Learning for Health Care at ETH Zürich
 
 ## How to run on the Leonhard Cluster:
