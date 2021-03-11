@@ -43,7 +43,7 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 module load eth_proxy python_gpu/3.7.4
 pip install --user nibabel
 pip install --user --upgrade torch
-pip install --user --upgrade trochvision
+pip install --user --upgrade torchvision
 bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" ./run.sh
 ```
 
