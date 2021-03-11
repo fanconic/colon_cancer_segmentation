@@ -26,7 +26,7 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 
 - `run.sh`: Script to train the U-Net on the leonhard
 - `train.py`: Main training loop in PyTorch
-- `settings.py`: Settings for hyperparameters and variables
+- `settings.py`: Settings for paths, hyperparameters and variables
 
 ### Source Code Directory Tree
 ```
@@ -50,7 +50,7 @@ bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtota
 ## Contributors
 - Claudio Fanconi - fanconic@ethz.ch
 - Manuel Studer - manstude@ethz.ch
-- Severin Husmann -shusmann@ethz.ch
+- Severin Husmann - shusmann@ethz.ch
 
 ## References:
 - https://www.kaggle.com/godeep48/simple-unet-pytorch
