@@ -51,3 +51,6 @@ bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtota
 - Claudio Fanconi - fanconic@ethz.ch
 - Manuel Studer - manstude@ethz.ch
 
+## Sources:
+- https://www.kaggle.com/godeep48/simple-unet-pytorch
+
