@@ -18,17 +18,30 @@ from settings import (
     chkpoint_file,
     learning_rate,
     num_epochs,
+    train_val_splitting_ratio,
+    seed
 )
 from src.data.preprocessing import resize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
 from src.model.metrics import IoU
+from sklearn.model_selection import train_test_split
+from src.utils.utils import list_files
 
-# Prepare Data Generator
-full_dataset = CustomDataLoader(
+#splitting data into train and val sets
+files = list_files(train_dir)
+lables = list_files(labels_dir)
+train_files, val_files, train_labels, val_labels = train_test_split(files, lables, train_size=train_val_splitting_ratio, random_state=seed)
+
+
+# Prepare Training Data Generator
+train_dataset = CustomDataLoader(
     train_dir,
     labels_dir,
+    train_files,
+    train_labels,
+    True, #whether is_train
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -50,11 +63,33 @@ full_dataset = CustomDataLoader(
     skip_blank=skip_empty,
 )
 
-# Train Test Split
-train_size = int(0.8 * len(full_dataset))
-val_size = len(full_dataset) - train_size
-train_dataset, val_dataset = torch.utils.data.random_split(
-    full_dataset, [train_size, val_size]
+
+# Prepare Val Data Generator
+val_dataset = CustomDataLoader(
+    train_dir,
+    labels_dir,
+    val_files,
+    val_labels,
+    False, #whether is_train
+    transforms=tfms.Compose(
+        [
+            tfms.ToTensor(),
+            tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.RandomHorizontalFlip(),
+            tfms.RandomVerticalFlip(),
+            tfms.RandomRotation(45, fill=-1024),
+        ]
+    ),
+    target_transforms=tfms.Compose(
+        [
+            tfms.ToTensor(),
+            tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.RandomHorizontalFlip(),
+            tfms.RandomVerticalFlip(),
+            tfms.RandomRotation(45, fill=0),
+        ]
+    ),
+    skip_blank=skip_empty,
 )
 
 train_loader = data.DataLoader(

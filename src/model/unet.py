@@ -14,7 +14,7 @@ class double_conv(nn.Module):
             nn.Conv2d(in_channel, out_channel, 3, padding=1),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(out_channel),
-            # nn.Dropout2d(p=0.25, inplace=False),
+            nn.Dropout2d(p=0.2, inplace=False), #dropout with prob 0.2
             nn.Conv2d(out_channel, out_channel, 3, padding=1),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(out_channel),

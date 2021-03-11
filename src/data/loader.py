@@ -18,6 +18,9 @@ class CustomDataLoader(data.Dataset):
         self,
         root_dir,
         seg_dir,
+        files,
+        labels,
+        is_train,
         transforms=None,
         target_transforms=None,
         skip_blank=False,
@@ -26,8 +29,9 @@ class CustomDataLoader(data.Dataset):
         self.seg_dir = seg_dir
         self.transforms = transforms
         self.target_transforms = target_transforms
-        self.files = list_files(self.root_dir)
-        self.lables = list_files(self.seg_dir)
+        self.is_train = is_train,
+        self.files = files
+        self.lables = labels
         self.skip_blank = skip_blank
         print("Number of files: ", len(self.files))
 
@@ -43,7 +47,7 @@ class CustomDataLoader(data.Dataset):
         label = np.float32(label)
 
         # Only use depth channels which contain a positive label
-        if self.skip_blank:
+        if self.skip_blank and self.is_train:
             non_blanks = (label != 0).any((0, 1))
             label = label[:, :, non_blanks]
             img = img[:, :, non_blanks]
