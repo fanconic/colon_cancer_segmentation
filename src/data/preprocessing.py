@@ -1,7 +1,7 @@
 import torch.nn.functional as F
 
 
-def resize(image, size=512, mode="nearest"):
+def resize(image, size=512, mode="bilinear"):
     """
     resize the 3D image to the shape we want, in width and length
     Params:

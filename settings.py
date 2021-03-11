@@ -21,12 +21,12 @@ model_file = os.path.join(model_dir, "bestmodel.pt")
 chkpoint_file = os.path.join(model_dir, "chkpoint_")
 
 train_dir = os.path.join(data_path, "imagesTr")
-labels_dir = os.path.join(data_path, "imagesTr")
+labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
 
 num_epochs = 50
-batch_size = 2
-img_size = 256
+batch_size = 3
+img_size = 128
 learning_rate = 1e-3
 
 skip_empty = True
