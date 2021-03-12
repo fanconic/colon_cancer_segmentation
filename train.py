@@ -19,7 +19,8 @@ from settings import (
     learning_rate,
     num_epochs,
     train_val_splitting_ratio,
-    seed
+    seed,
+    max_epochs_no_improve
 )
 from src.data.preprocessing import resize
 from src.model.unet import UNet
@@ -124,6 +125,12 @@ total_train_score = []
 total_valid_loss = []
 total_valid_score = []
 
+# vars for early stopping
+epochs_no_improve = 0
+best_current_checkpoint = None
+best_current_checkpoint_file = None
+best_current_model_file = None
+
 losses_value = 0
 for epoch in range(num_epochs):
 
@@ -193,7 +200,7 @@ for epoch in range(num_epochs):
     # save checkpoint
     src.utils.utils.save_ckp(checkpoint, False, chkpoint_file, model_file)
 
-    ## TODO: save the model if validation loss has decreased
+
     if total_valid_loss[-1] <= valid_loss_min:
         print(
             "Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...".format(
@@ -203,3 +210,20 @@ for epoch in range(num_epochs):
         # save checkpoint as best model
         src.utils.utils.save_ckp(checkpoint, False, chkpoint_file, model_file)
         valid_loss_min = total_valid_loss[-1]
+        
+        # keeping track of current best model (for early stopping)
+        best_current_checkpoint = checkpoint
+        best_current_checkpoint_file = chkpoint_file
+        best_current_model_file = model_file
+        epochs_no_improve = 0
+        
+        
+    else:
+    	# epoch passed without improvement
+    	epochs_no_improve += 1
+    	
+    
+    #checking for early stopping
+    if(epochs_no_improve > max_epochs_no_improve): 
+    	# saving model as best model
+    	src.utils.utils.save_ckp(best_current_checkpoint, True, best_current_checkpoint_file, best_current_model_file)

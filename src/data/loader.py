@@ -58,7 +58,7 @@ class CustomDataLoader(data.Dataset):
         if self.transforms is not None:
             img = self.transforms(img)
 
-        random.seed(seed)  # apply this seed to target tranfsorms
+        random.seed(seed)  # apply this seed to target transforms
         torch.manual_seed(seed)  # needed for torchvision 0.7
         if self.target_transforms is not None:
             label = self.target_transforms(label)
