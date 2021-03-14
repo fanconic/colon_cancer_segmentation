@@ -16,24 +16,24 @@ class double_conv(nn.Module):
         super(double_conv, self).__init__()
         
         if(with_dropout):
-	       self.conv = nn.Sequential(
-		    nn.Conv2d(in_channel, out_channel, 3, padding=1),
-		    nn.ReLU(inplace=True),
-		    nn.BatchNorm2d(out_channel),
-		    nn.Dropout2d(p=drop_prob, inplace=False),
-		    nn.Conv2d(out_channel, out_channel, 3, padding=1),
-		    nn.ReLU(inplace=True),
-		    nn.BatchNorm2d(out_channel),
-		)
-	else:
-		self.conv = nn.Sequential(
-		    nn.Conv2d(in_channel, out_channel, 3, padding=1),
-		    nn.ReLU(inplace=True),
-		    nn.BatchNorm2d(out_channel),
-		    nn.Conv2d(out_channel, out_channel, 3, padding=1),
-		    nn.ReLU(inplace=True),
-		    nn.BatchNorm2d(out_channel),
-		)
+            self.conv = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+                nn.Dropout2d(p=drop_prob, inplace=False),
+                nn.Conv2d(out_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+		    )
+        else:
+            self.conv = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+                nn.Conv2d(out_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+            )
 
     def forward(self, x):
         x = self.conv(x)

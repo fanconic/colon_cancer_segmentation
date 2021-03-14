@@ -29,7 +29,7 @@ class CustomDataLoader(data.Dataset):
         self.seg_dir = seg_dir
         self.transforms = transforms
         self.target_transforms = target_transforms
-        self.is_train = is_train,
+        self.is_train = (is_train,)
         self.files = files
         self.lables = labels
         self.skip_blank = skip_blank
@@ -66,6 +66,37 @@ class CustomDataLoader(data.Dataset):
         return img, label
 
 
+class CustomTestLoader(data.Dataset):
+    """
+    Custom Test Loader for CT iamges, such that these can be processed directly
+    out of memory.
+    """
+
+    def __init__(
+        self,
+        root_dir,
+        files,
+        transforms=None,
+    ):
+        self.root_dir = root_dir
+        self.transforms = transforms
+        self.files = files
+        print("Number of files: ", len(self.files))
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, idx):
+        img_name = self.files[idx]
+        img = nib.load(os.path.join(self.root_dir, img_name)).get_fdata()
+        img = np.float32(img)
+
+        if self.transforms is not None:
+            img = self.transforms(img)
+
+        return img
+
+
 def custom_collate(batch):
     """
     custom collate function for 3d images of variable depth
@@ -80,6 +111,20 @@ def custom_collate(batch):
     target = torch.stack(list(itertools.chain(*target))).unsqueeze(1)
 
     return [data, target]
+
+
+def test_collate(batch):
+    """
+    custom collate function for 3d images of variable depth for testing
+    Params:
+        batch: is the next batch which should be processed
+    Returns:
+        list containing the data
+    """
+    data = [item for item in batch]
+    data = torch.stack(list(itertools.chain(*data))).unsqueeze(1)
+
+    return data
 
 
 def custom_collate_permute(batch):
