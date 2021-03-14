@@ -32,3 +32,11 @@ learning_rate = 1e-3
 skip_empty = True
 input_channels = 1
 output_channels = 1
+
+train_val_splitting_ratio = 0.8
+seed = 1234
+
+with_dropout = True
+drop_prob = 0.2
+
+max_epochs_no_improve = 10
