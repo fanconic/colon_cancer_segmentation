@@ -45,6 +45,7 @@ train_dataset = CustomDataLoader(
     train_files,
     train_labels,
     True,  # whether is_train
+    skip_blank=skip_empty,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -69,7 +70,6 @@ train_dataset = CustomDataLoader(
             tfms.Lambda(normalize),
         ]
     ),
-    skip_blank=skip_empty,
 )
 
 
@@ -93,8 +93,7 @@ val_dataset = CustomDataLoader(
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             tfms.Lambda(normalize),
         ]
-    ),
-    skip_blank=skip_empty,
+    )
 )
 
 train_loader = data.DataLoader(
