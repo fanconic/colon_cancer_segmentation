@@ -19,7 +19,7 @@ from settings import (
     learning_rate,
     num_epochs,
 )
-from src.data.preprocessing import resize
+from src.data.preprocessing import resize, normalize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
@@ -33,18 +33,24 @@ full_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomHorizontalFlip(),
+            # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
-            tfms.RandomRotation(45, fill=-1024),
+            tfms.RandomRotation(
+                10, fill=-1024
+            ),  # Only small rotations, as all the patients lay in the same position
+            tfms.Lambda(normalize),
         ]
     ),
     target_transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomHorizontalFlip(),
+            # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
-            tfms.RandomRotation(45, fill=0),
+            tfms.RandomRotation(
+                10, fill=0
+            ),  # Only small rotations, as all the patients lay in the same position
+            tfms.Lambda(normalize),
         ]
     ),
     skip_blank=skip_empty,
