@@ -26,7 +26,7 @@ from src.data.preprocessing import resize, normalize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
-from src.model.metrics import IoU
+from src.model.metrics import IoU, Threshold_IoU
 from sklearn.model_selection import train_test_split
 from src.utils.utils import list_files
 
@@ -118,13 +118,17 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 # from engine import evaluate
 criterion = DiceLoss()
 accuracy_metric = IoU()
+threshold_metric = Threshold_IoU()
 valid_loss_min = np.Inf
 
 
 total_train_loss = []
 total_train_score = []
+total_train_score_round = []
 total_valid_loss = []
 total_valid_score = []
+total_valid_score_round = []
+
 
 # vars for early stopping
 epochs_no_improve = 0
@@ -134,35 +138,40 @@ best_current_model_file = None
 
 losses_value = 0
 for epoch in range(num_epochs):
-
+  
     train_loss = []
     train_score = []
+    train_score_round = []
     valid_loss = []
     valid_score = []
-    # <-----------Training Loop---------------------------->
-    pbar = tqdm(train_loader, desc="description")
+    valid_score_round = []
+    #<-----------Training Loop---------------------------->
+    pbar = tqdm(train_loader, desc = 'description')
     for x_train, y_train in pbar:
         x_train = torch.autograd.Variable(x_train).cuda()
         y_train = torch.autograd.Variable(y_train).cuda()
         optimizer.zero_grad()
         output = model(x_train)
-        # Loss
+        #Loss
         loss = criterion(output, y_train)
         losses_value = loss.item()
-        # Score
-        score = accuracy_metric(output, y_train)
+        #Score
+        score = accuracy_metric(output,y_train)
+        score_t = threshold_metric(output,y_train)
+        # Optimizing
         loss.backward()
         optimizer.step()
+        # Logging
         train_loss.append(losses_value)
         train_score.append(score.item())
-        # train_score.append(score)
+        train_score_round.append(score_t.item())
         pbar.set_description(
-            "Epoch: {}, loss: {}, IoU: {}".format(epoch + 1, losses_value, score)
+            "Epoch: {}, loss: {}, IoU: {}, t_IoU: {}".format(epoch + 1, losses_value, score, score_t)
         )
 
-    # <---------------Validation Loop---------------------->
+    #<---------------Validation Loop---------------------->
     with torch.no_grad():
-        for image, mask in val_loader:
+        for image,mask in val_loader:
             image = torch.autograd.Variable(image).cuda()
             mask = torch.autograd.Variable(mask).cuda()
             output = model(image)
@@ -170,22 +179,27 @@ for epoch in range(num_epochs):
             loss = criterion(output, mask)
             losses_value = loss.item()
             ## Compute Accuracy Score
-            score = accuracy_metric(output, mask)
+            score = accuracy_metric(output,mask)
+            score_t = threshold_metric(output,mask)
+            # logging
             valid_loss.append(losses_value)
             valid_score.append(score.item())
+            valid_score_round.append((score.item()))
 
     total_train_loss.append(np.mean(train_loss))
     total_train_score.append(np.mean(train_score))
     total_valid_loss.append(np.mean(valid_loss))
     total_valid_score.append(np.mean(valid_score))
+    total_train_score_round.append(np.mean(train_score_round))
+    total_valid_score_round.append(np.mean(valid_score_round))
     print(
-        "\n###############Train Loss: {}, Train IOU: {}###############".format(
-            total_train_loss[-1], total_train_score[-1]
+        "\n###########Train Loss: {}, Train IOU: {}, Train Threshold IoU: {}###########".format(
+            total_train_loss[-1], total_train_score[-1], total_train_score_round[-1]
         )
     )
     print(
-        "###############Valid Loss: {}, Valid IOU: {}###############".format(
-            total_valid_loss[-1], total_valid_score[-1]
+        "###########Valid Loss: {}, Valid IOU: {}, Valid Threshold IoU: {}###########".format(
+            total_valid_loss[-1], total_valid_score[-1], total_valid_score_round[-1]
         )
     )
 
