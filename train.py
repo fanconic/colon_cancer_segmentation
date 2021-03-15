@@ -44,13 +44,11 @@ train_dataset = CustomDataLoader(
     labels_dir,
     train_files,
     train_labels,
-    True,  # whether is_train
     skip_blank=skip_empty,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
             tfms.RandomRotation(
                 10, fill=-1024
@@ -62,7 +60,6 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
             tfms.RandomRotation(
                 10, fill=0
@@ -78,7 +75,7 @@ val_dataset = CustomDataLoader(
     labels_dir,
     val_files,
     val_labels,
-    False,  # whether is_train
+    skip_blank=False,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -91,14 +88,13 @@ val_dataset = CustomDataLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
         ]
-    )
+    ),
 )
 
 train_loader = data.DataLoader(
     train_dataset,
-    shuffle=True,
+    shuffle=False,
     batch_size=batch_size,
-    collate_fn=custom_collate_permute,
     num_workers=0,
 )
 
@@ -106,7 +102,6 @@ val_loader = data.DataLoader(
     val_dataset,
     shuffle=False,
     batch_size=batch_size,
-    collate_fn=custom_collate,
     num_workers=0,
 )
 
