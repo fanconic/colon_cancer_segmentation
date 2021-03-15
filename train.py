@@ -135,6 +135,11 @@ for epoch in range(num_epochs):
     valid_loss = []
     valid_score = []
     # <-----------Training Loop---------------------------->
+
+    # reset the counters
+    train_dataset.reset_counters()
+    val_dataset.reset_counters()
+
     pbar = tqdm(train_loader, desc="description")
     for x_train, y_train in pbar:
         x_train = torch.autograd.Variable(x_train).cuda()

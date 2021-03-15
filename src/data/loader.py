@@ -102,6 +102,15 @@ class CustomDataLoader(data.Dataset):
 
         return img, label
 
+    def reset_counters(self):
+        """Resets the counters"""
+        self.counter = 0
+        self.index_offset = 0
+        self.current_img_nib, self.current_label_nib = self.load_nibs(
+            self.files[self.counter], self.labels[self.counter]
+        )
+        self.counter += 1
+
 
 class CustomTestLoader(data.Dataset):
     """
