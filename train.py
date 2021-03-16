@@ -49,9 +49,8 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomVerticalFlip(),
             tfms.RandomRotation(
-                10, fill=-1024
+                5, fill=-1024
             ),  # Only small rotations, as all the patients lay in the same position
             tfms.Lambda(normalize),
         ]
@@ -60,9 +59,8 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomVerticalFlip(),
             tfms.RandomRotation(
-                10, fill=0
+                5, fill=0
             ),  # Only small rotations, as all the patients lay in the same position
         ]
     ),

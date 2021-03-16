@@ -47,6 +47,11 @@ class Threshold_IoU(nn.Module):
         total = (inputs + targets).sum()
         union = total - intersection
 
-        IoU = (intersection + smooth) / (union + smooth)
+        nominator = intersection + smooth
+        denominator = union + smooth
+        if nominator == smooth and denominator == smooth:
+            IoU = torch.Tensor(0)
+        else:
+            IoU = nominator / denominator
 
         return IoU
