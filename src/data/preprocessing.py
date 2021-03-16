@@ -10,6 +10,8 @@ def resize(image, size=512, mode="bilinear"):
     Returns:
         resized image in width and length
     """
+    if size == 512:
+        return image
     return F.interpolate(image.unsqueeze(0), size=(size, size), mode=mode)[0]
 
 

@@ -125,19 +125,54 @@ class CustomTestLoader(data.Dataset):
         transforms=None,
     ):
         self.root_dir = root_dir
-        self.transforms = transforms
         self.files = files
+        self.transforms = transforms
+        self.counter = 0
+        self.index_offset = 0
         print("Number of files: ", len(self.files))
 
+        # Extract the first file
+        self.current_img_nib = self.load_nibs(self.files[self.counter])
+        self.counter += 1
+
     def __len__(self):
-        return len(self.files)
+        len = 0
+        for x in self.files:
+            img = nib.load(os.path.join(self.root_dir, x))
+            len += img.shape[2]
+            del img
+        return len
 
     def __getitem__(self, idx):
-        img_name = self.files[idx]
-        img = nib.load(os.path.join(self.root_dir, img_name)).get_fdata()
-        img = np.float32(img)
+
+        # Load new file if index is out of range
+        if (idx - self.index_offset) >= self.current_img_nib.shape[2]:
+            self.index_offset += self.current_img_nib.shape[2]
+            self.current_img_nib = self.load_nibs(self.files[self.counter])
+            self.counter += 1
+
+        # Extract image and label
+        img = self.current_img_nib[:, :, idx - self.index_offset]
 
         if self.transforms is not None:
             img = self.transforms(img)
 
         return img
+
+    def load_nibs(self, x_file):
+        """Load a new nib file
+        Args:
+            x_file: path to the image
+        Returns newly loaded NIB files
+        """
+        img = nib.load(os.path.join(self.root_dir, x_file)).get_fdata()
+        img = np.float32(img)
+
+        return img
+
+    def reset_counters(self):
+        """Resets the counters"""
+        self.counter = 0
+        self.index_offset = 0
+        self.current_img_nib = self.load_nibs(self.files[self.counter])
+        self.counter += 1
