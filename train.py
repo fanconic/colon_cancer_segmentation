@@ -52,9 +52,9 @@ train_dataset = CustomDataLoader(
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
-            tfms.RandomRotation(
-                10, fill=-1024
-            ),  # Only small rotations, as all the patients lay in the same position
+            #tfms.RandomRotation(
+            #    10, fill=-1024
+            #),  # Only small rotations, as all the patients lay in the same position
             tfms.Lambda(normalize),
         ]
     ),
@@ -64,9 +64,9 @@ train_dataset = CustomDataLoader(
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             # tfms.RandomHorizontalFlip(),
             tfms.RandomVerticalFlip(),
-            tfms.RandomRotation(
-                10, fill=0
-            ),  # Only small rotations, as all the patients lay in the same position
+            #tfms.RandomRotation(
+            #    10, fill=0
+            #),  # Only small rotations, as all the patients lay in the same position
         ]
     ),
 )
@@ -137,8 +137,9 @@ best_current_checkpoint_file = None
 best_current_model_file = None
 
 losses_value = 0
+
 for epoch in range(num_epochs):
-  
+    model.train()
     train_loss = []
     train_score = []
     train_score_round = []
@@ -171,6 +172,7 @@ for epoch in range(num_epochs):
 
     #<---------------Validation Loop---------------------->
     with torch.no_grad():
+        model.eval()
         for image,mask in val_loader:
             image = torch.autograd.Variable(image).cuda()
             mask = torch.autograd.Variable(mask).cuda()
