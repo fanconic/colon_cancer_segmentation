@@ -139,6 +139,7 @@ for epoch in range(num_epochs):
     train_score_round = []
     valid_loss = []
     valid_score = []
+    valid_score_round = []
 
     # <-----------Training Loop---------------------------->
     # reset the counters
