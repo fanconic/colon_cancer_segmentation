@@ -186,7 +186,7 @@ for epoch in range(num_epochs):
             # logging
             valid_loss.append(losses_value)
             valid_score.append(score.item())
-            valid_score_round.append((score.item()))
+            valid_score_round.append((score_t.item()))
 
     total_train_loss.append(np.mean(train_loss))
     total_train_score.append(np.mean(train_score))
