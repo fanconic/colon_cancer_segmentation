@@ -129,7 +129,7 @@ best_current_model_file = None
 
 losses_value = 0
 for epoch in range(num_epochs):
-
+    model.train()
     train_loss = []
     train_score = []
     valid_loss = []
@@ -161,6 +161,7 @@ for epoch in range(num_epochs):
         )
 
     # <---------------Validation Loop---------------------->
+    model.eval()
     with torch.no_grad():
         for image, mask in val_loader:
             image = torch.autograd.Variable(image).cuda()

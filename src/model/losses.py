@@ -7,7 +7,7 @@ class DiceBCELoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceBCELoss, self).__init__()
 
-    def forward(self, inputs, targets, smooth=1):
+    def forward(self, inputs, targets, smooth=1e-6):
 
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = F.sigmoid(inputs)
@@ -30,7 +30,7 @@ class DiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceLoss, self).__init__()
 
-    def forward(self, inputs, targets, smooth=1):
+    def forward(self, inputs, targets, smooth=1e-6):
 
         # flatten label and prediction tensors
         inputs = inputs.view(-1)
