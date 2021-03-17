@@ -51,6 +51,7 @@ train_dataset = CustomDataLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             tfms.Lambda(normalize),
+            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
@@ -81,7 +82,6 @@ val_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.Lambda(torch_equalize),
         ]
     ),
 )
@@ -127,6 +127,7 @@ best_current_checkpoint_file = None
 best_current_model_file = None
 
 losses_value = 0
+
 for epoch in range(num_epochs):
     model.train()
     train_loss = []
