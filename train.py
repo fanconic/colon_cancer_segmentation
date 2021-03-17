@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as tfms
 import torch
 import torch.utils.data as data
-from src.data.loader import CustomDataLoader, custom_collate_permute, custom_collate
+from src.data.loader import CustomDataLoader
 from settings import (
     train_dir,
     labels_dir,
