@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as tfms
 import torch
 import torch.utils.data as data
-from src.data.loader import CustomTestLoader, test_collate
+from src.data.loader import CustomTestLoader
 from src.model.unet import UNet
 from settings import (
     test_dir,
@@ -15,7 +15,7 @@ from settings import (
     chkpoint_file,
     seed,
 )
-from src.data.preprocessing import resize, normalize
+from src.data.preprocessing import resize, normalize, torch_equalize
 import src
 from src.utils.utils import list_files
 
@@ -31,6 +31,7 @@ test_dataset = CustomTestLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             tfms.Lambda(normalize),
+            tfms.Lambda(torch_equalize),
         ]
     ),
 )
