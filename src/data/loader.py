@@ -80,7 +80,7 @@ class CustomDataLoader(data.Dataset):
         if self.target_transforms is not None:
             label = self.target_transforms(label)
 
-        return img, label
+        return img, label[0]
 
     def load_nibs(self, x_file, y_file):
         """Load a new nib file, optionally also skips all the blank labels

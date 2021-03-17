@@ -53,6 +53,7 @@ with torch.no_grad():
     for image in pbar:
         image = torch.autograd.Variable(image).cuda()
         output = model(image)
+        output = torch.sigmoid(output)
         output = torch.round(output)
 
         # TODO:

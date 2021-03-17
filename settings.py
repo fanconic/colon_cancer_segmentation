@@ -26,7 +26,7 @@ test_dir = os.path.join(data_path, "imagesTs")
 
 num_epochs = 50
 batch_size = 1
-img_size = 128
+img_size = 512
 learning_rate = 1e-3
 
 skip_empty = False
@@ -37,6 +37,6 @@ train_val_splitting_ratio = 0.8
 seed = 1234
 
 with_dropout = False
-drop_prob = 0.1
+drop_prob = 0.0
 
 max_epochs_no_improve = 10

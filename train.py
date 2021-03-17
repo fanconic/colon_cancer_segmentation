@@ -22,7 +22,7 @@ from settings import (
     seed,
     max_epochs_no_improve,
 )
-from src.data.preprocessing import resize, normalize
+from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
@@ -45,13 +45,11 @@ train_dataset = CustomDataLoader(
     train_files,
     train_labels,
     skip_blank=skip_empty,
+    shuffle=True,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomRotation(
-                5, fill=-1024
-            ),  # Only small rotations, as all the patients lay in the same position
             tfms.Lambda(normalize),
         ]
     ),
@@ -59,9 +57,6 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomRotation(
-                5, fill=0
-            ),  # Only small rotations, as all the patients lay in the same position
         ]
     ),
 )
@@ -79,12 +74,14 @@ val_dataset = CustomDataLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             tfms.Lambda(normalize),
+            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.Lambda(torch_equalize),
         ]
     ),
 )
@@ -193,13 +190,23 @@ for epoch in range(num_epochs):
     total_train_score_round.append(np.mean(train_score_round))
     total_valid_score_round.append(np.mean(valid_score_round))
     print(
-        "\n###########Train Loss: {}, Train IOU: {}, Train Threshold IoU: {}###########".format(
-            total_train_loss[-1], total_train_score[-1], total_train_score_round[-1]
+        "\n###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
+            total_train_loss[-1],
+            np.std(train_loss),
+            total_train_score[-1],
+            np.std(train_score),
+            total_train_score_round[-1],
+            np.std(train_score_round),
         )
     )
     print(
-        "###########Valid Loss: {}, Valid IOU: {}, Valid Threshold IoU: {}###########".format(
-            total_valid_loss[-1], total_valid_score[-1], total_valid_score_round[-1]
+        "###########Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}###########".format(
+            total_valid_loss[-1],
+            np.std(valid_loss),
+            total_valid_score[-1],
+            np.std(valid_score),
+            total_valid_score_round[-1],
+            np.std(valid_score_round),
         )
     )
 
