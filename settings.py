@@ -24,7 +24,7 @@ train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
 
-num_epochs = 50
+num_epochs = 40
 batch_size = 1
 img_size = 512
 learning_rate = 1e-3

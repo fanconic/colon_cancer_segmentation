@@ -50,7 +50,7 @@ class Threshold_IoU(nn.Module):
         nominator = intersection + smooth
         denominator = union + smooth
         if nominator == smooth and denominator == smooth:
-            IoU = torch.Tensor(0)
+            IoU = torch.Tensor([0])
         else:
             IoU = nominator / denominator
 
