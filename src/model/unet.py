@@ -1,9 +1,6 @@
 import torch
 import torch.nn as nn
-from settings import (
-	with_dropout,
-	drop_prob
-)
+from settings import with_dropout, drop_prob
 
 
 class double_conv(nn.Module):
@@ -14,26 +11,26 @@ class double_conv(nn.Module):
 
     def __init__(self, in_channel, out_channel):
         super(double_conv, self).__init__()
-        
-        if(with_dropout):
-        	self.conv = nn.Sequential(
-        		nn.Conv2d(in_channel, out_channel, 3, padding=1),
-			nn.ReLU(inplace=True),
-			nn.BatchNorm2d(out_channel),
-			nn.Dropout2d(p=drop_prob, inplace=False),
-			nn.Conv2d(out_channel, out_channel, 3, padding=1),
-			nn.ReLU(inplace=True),
-			nn.BatchNorm2d(out_channel)
-		)
+
+        if with_dropout:
+            self.conv = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+                nn.Dropout2d(p=drop_prob, inplace=False),
+                nn.Conv2d(out_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+            )
         else:
-        	self.conv = nn.Sequential(
-        		nn.Conv2d(in_channel, out_channel, 3, padding=1),
-        		nn.ReLU(inplace=True),
-        		nn.BatchNorm2d(out_channel),
-        		nn.Conv2d(out_channel, out_channel, 3, padding=1),
-        		nn.ReLU(inplace=True),
-        		nn.BatchNorm2d(out_channel)
-        	)
+            self.conv = nn.Sequential(
+                nn.Conv2d(in_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+                nn.Conv2d(out_channel, out_channel, 3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.BatchNorm2d(out_channel),
+            )
 
     def forward(self, x):
         x = self.conv(x)
@@ -106,6 +103,6 @@ class UNet(nn.Module):
         x11 = self.up_block4(x10, x3)
         x12 = self.up_block5(x11, x2)
         x13 = self.up_block6(x12, x1)
-        x14 = self.up_block7(x13)
-        out = torch.sigmoid(x14)
+        out = self.up_block7(x13)
+        # out = torch.sigmoid(x14)
         return out

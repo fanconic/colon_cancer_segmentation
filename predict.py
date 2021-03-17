@@ -20,9 +20,9 @@ import src
 from src.utils.utils import list_files
 
 
+# Prepare Test Data Generator
 test_files = list_files(test_dir)
 
-# Prepare Test Data Generator
 test_dataset = CustomTestLoader(
     test_dir,
     test_files,
@@ -40,22 +40,21 @@ test_loader = data.DataLoader(
     test_dataset,
     shuffle=False,
     batch_size=batch_size,
-    collate_fn=test_collate,
     num_workers=0,
 )
 
-# Load model
 model = UNet(1, 1).cuda()
 model.load_state_dict(torch.load(model_file)["state_dict"])
 model.eval()
-
-
 # <---------------Test Loop---------------------->
 with torch.no_grad():
     pbar = tqdm(test_loader, desc="description")
+    test_dataset.reset_counters()
     for image in pbar:
         image = torch.autograd.Variable(image).cuda()
         output = model(image)
+        output = torch.sigmoid(output)
+        output = torch.round(output)
 
         # TODO:
         # save the images

@@ -22,7 +22,7 @@ from settings import (
     seed,
     max_epochs_no_improve,
 )
-from src.data.preprocessing import resize, normalize
+from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
@@ -44,29 +44,20 @@ train_dataset = CustomDataLoader(
     labels_dir,
     train_files,
     train_labels,
-    True,  # whether is_train
     skip_blank=skip_empty,
+    shuffle=True,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            # tfms.RandomHorizontalFlip(),
-            tfms.RandomVerticalFlip(),
-            #tfms.RandomRotation(
-            #    10, fill=-1024
-            #),  # Only small rotations, as all the patients lay in the same position
             tfms.Lambda(normalize),
+            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            # tfms.RandomHorizontalFlip(),
-            tfms.RandomVerticalFlip(),
-            #tfms.RandomRotation(
-            #    10, fill=0
-            #),  # Only small rotations, as all the patients lay in the same position
         ]
     ),
 )
@@ -78,12 +69,13 @@ val_dataset = CustomDataLoader(
     labels_dir,
     val_files,
     val_labels,
-    False,  # whether is_train
+    skip_blank=False,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
             tfms.Lambda(normalize),
+            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
@@ -91,14 +83,13 @@ val_dataset = CustomDataLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
         ]
-    )
+    ),
 )
 
 train_loader = data.DataLoader(
     train_dataset,
-    shuffle=True,
+    shuffle=False,
     batch_size=batch_size,
-    collate_fn=custom_collate_permute,
     num_workers=0,
 )
 
@@ -106,7 +97,6 @@ val_loader = data.DataLoader(
     val_dataset,
     shuffle=False,
     batch_size=batch_size,
-    collate_fn=custom_collate,
     num_workers=0,
 )
 
@@ -146,19 +136,23 @@ for epoch in range(num_epochs):
     valid_loss = []
     valid_score = []
     valid_score_round = []
-    #<-----------Training Loop---------------------------->
-    pbar = tqdm(train_loader, desc = 'description')
+
+    # <-----------Training Loop---------------------------->
+    # reset the counters
+    train_dataset.reset_counters()
+    val_dataset.reset_counters()
+    pbar = tqdm(train_loader, desc="description")
     for x_train, y_train in pbar:
         x_train = torch.autograd.Variable(x_train).cuda()
         y_train = torch.autograd.Variable(y_train).cuda()
         optimizer.zero_grad()
         output = model(x_train)
-        #Loss
+        # Loss
         loss = criterion(output, y_train)
         losses_value = loss.item()
-        #Score
-        score = accuracy_metric(output,y_train)
-        score_t = threshold_metric(output,y_train)
+        # Score
+        score = accuracy_metric(output, y_train)
+        score_t = threshold_metric(output, y_train)
         # Optimizing
         loss.backward()
         optimizer.step()
@@ -167,13 +161,15 @@ for epoch in range(num_epochs):
         train_score.append(score.item())
         train_score_round.append(score_t.item())
         pbar.set_description(
-            "Epoch: {}, loss: {}, IoU: {}, t_IoU: {}".format(epoch + 1, losses_value, score, score_t)
+            "Epoch: {}, loss: {}, IoU: {}, t_IoU: {}".format(
+                epoch + 1, losses_value, score, score_t
+            )
         )
 
-    #<---------------Validation Loop---------------------->
+    # <---------------Validation Loop---------------------->
+    model.eval()
     with torch.no_grad():
-        model.eval()
-        for image,mask in val_loader:
+        for image, mask in val_loader:
             image = torch.autograd.Variable(image).cuda()
             mask = torch.autograd.Variable(mask).cuda()
             output = model(image)
@@ -181,12 +177,12 @@ for epoch in range(num_epochs):
             loss = criterion(output, mask)
             losses_value = loss.item()
             ## Compute Accuracy Score
-            score = accuracy_metric(output,mask)
-            score_t = threshold_metric(output,mask)
+            score = accuracy_metric(output, mask)
+            score_t = threshold_metric(output, mask)
             # logging
             valid_loss.append(losses_value)
             valid_score.append(score.item())
-            valid_score_round.append((score.item()))
+            valid_score_round.append((score_t.item()))
 
     total_train_loss.append(np.mean(train_loss))
     total_train_score.append(np.mean(train_score))
@@ -195,13 +191,23 @@ for epoch in range(num_epochs):
     total_train_score_round.append(np.mean(train_score_round))
     total_valid_score_round.append(np.mean(valid_score_round))
     print(
-        "\n###########Train Loss: {}, Train IOU: {}, Train Threshold IoU: {}###########".format(
-            total_train_loss[-1], total_train_score[-1], total_train_score_round[-1]
+        "\n###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
+            total_train_loss[-1],
+            np.std(train_loss),
+            total_train_score[-1],
+            np.std(train_score),
+            total_train_score_round[-1],
+            np.std(train_score_round),
         )
     )
     print(
-        "###########Valid Loss: {}, Valid IOU: {}, Valid Threshold IoU: {}###########".format(
-            total_valid_loss[-1], total_valid_score[-1], total_valid_score_round[-1]
+        "###########Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}###########".format(
+            total_valid_loss[-1],
+            np.std(valid_loss),
+            total_valid_score[-1],
+            np.std(valid_score),
+            total_valid_score_round[-1],
+            np.std(valid_score_round),
         )
     )
 
