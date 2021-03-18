@@ -100,6 +100,12 @@ class CustomDataLoader(data.Dataset):
             label = label[:, :, non_blanks]
             img = img[:, :, non_blanks]
 
+        # shuffle the depth
+        if self.shuffle:
+            p = np.random.permutation(img.shape[2])
+            img = img[:,:,p]
+            label = label[:,:,p]
+
         return img, label
 
     def reset_counters(self):

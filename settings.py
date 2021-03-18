@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "001"
+experiment_run = "003"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"
@@ -24,12 +24,13 @@ train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
 
-num_epochs = 40
-batch_size = 1
+num_epochs = 50
+batch_size = 12
 img_size = 512
 learning_rate = 1e-3
 
 skip_empty = False
+shuffle_files = True
 input_channels = 1
 output_channels = 1
 

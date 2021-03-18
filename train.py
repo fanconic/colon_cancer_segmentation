@@ -21,6 +21,7 @@ from settings import (
     train_val_splitting_ratio,
     seed,
     max_epochs_no_improve,
+    shuffle_files
 )
 from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
@@ -45,11 +46,12 @@ train_dataset = CustomDataLoader(
     train_files,
     train_labels,
     skip_blank=skip_empty,
-    shuffle=True,
+    shuffle=shuffle_files,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.RandomRotation(5, fill=-1024),
             tfms.Lambda(normalize),
             tfms.Lambda(torch_equalize),
         ]
@@ -58,6 +60,7 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.RandomRotation(5, fill=0),
         ]
     ),
 )
@@ -70,6 +73,7 @@ val_dataset = CustomDataLoader(
     val_files,
     val_labels,
     skip_blank=False,
+    shuffle=False,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -141,8 +145,8 @@ for epoch in range(num_epochs):
     # reset the counters
     train_dataset.reset_counters()
     val_dataset.reset_counters()
-    pbar = tqdm(train_loader, desc="description")
-    for x_train, y_train in pbar:
+    #pbar = tqdm(train_loader, desc="description")
+    for x_train, y_train in train_loader:
         x_train = torch.autograd.Variable(x_train).cuda()
         y_train = torch.autograd.Variable(y_train).cuda()
         optimizer.zero_grad()
@@ -160,11 +164,11 @@ for epoch in range(num_epochs):
         train_loss.append(losses_value)
         train_score.append(score.item())
         train_score_round.append(score_t.item())
-        pbar.set_description(
+        """pbar.set_description(
             "Epoch: {}, loss: {}, IoU: {}, t_IoU: {}".format(
                 epoch + 1, losses_value, score, score_t
             )
-        )
+        )"""
 
     # <---------------Validation Loop---------------------->
     model.eval()

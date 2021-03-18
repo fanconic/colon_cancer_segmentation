@@ -7,7 +7,7 @@ class IoU(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(IoU, self).__init__()
 
-    def forward(self, inputs, targets, smooth=1):
+    def forward(self, inputs, targets, smooth=1e-6):
 
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
@@ -49,9 +49,9 @@ class Threshold_IoU(nn.Module):
 
         nominator = intersection + smooth
         denominator = union + smooth
-        if nominator == smooth and denominator == smooth:
-            IoU = torch.Tensor([0])
-        else:
-            IoU = nominator / denominator
+        #if nominator == smooth and denominator == smooth:
+        #    IoU = torch.Tensor([0])
+        #else:
+        IoU = nominator / denominator
 
         return IoU
