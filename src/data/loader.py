@@ -121,7 +121,7 @@ class CustomDataLoader(data.Dataset):
 
 class CustomTestLoader(data.Dataset):
     """
-    Custom Test Loader for CT iamges, such that these can be processed directly
+    Custom Test Loader for CT images, such that these can be processed directly
     out of memory.
     """
 
@@ -132,54 +132,32 @@ class CustomTestLoader(data.Dataset):
         transforms=None,
     ):
         self.root_dir = root_dir
-        self.files = files
         self.transforms = transforms
-        self.counter = 0
-        self.index_offset = 0
+        self.files = files
         print("Number of files: ", len(self.files))
 
-        # Extract the first file
-        self.current_img_nib = self.load_nibs(self.files[self.counter])
-        self.counter += 1
-
     def __len__(self):
-        len = 0
-        for x in self.files:
-            img = nib.load(os.path.join(self.root_dir, x))
-            len += img.shape[2]
-            del img
-        return len
+        return len(self.files)
 
     def __getitem__(self, idx):
-
-        # Load new file if index is out of range
-        if (idx - self.index_offset) >= self.current_img_nib.shape[2]:
-            self.index_offset += self.current_img_nib.shape[2]
-            self.current_img_nib = self.load_nibs(self.files[self.counter])
-            self.counter += 1
-
-        # Extract image and label
-        img = self.current_img_nib[:, :, idx - self.index_offset]
+        img_name = self.files[idx]
+        img = nib.load(os.path.join(self.root_dir, img_name)).get_fdata()
+        img = np.float32(img)
 
         if self.transforms is not None:
             img = self.transforms(img)
 
         return img
 
-    def load_nibs(self, x_file):
-        """Load a new nib file
-        Args:
-            x_file: path to the image
-        Returns newly loaded NIB files
-        """
-        img = nib.load(os.path.join(self.root_dir, x_file)).get_fdata()
-        img = np.float32(img)
+def test_collate(batch):
+    """
+    custom collate function for 3d images of variable depth for testing
+    Params:
+        batch: is the next batch which should be processed
+    Returns:
+        list containing the data
+    """
+    data = [item for item in batch]
+    data = torch.stack(list(itertools.chain(*data))).unsqueeze(1)
 
-        return img
-
-    def reset_counters(self):
-        """Resets the counters"""
-        self.counter = 0
-        self.index_offset = 0
-        self.current_img_nib = self.load_nibs(self.files[self.counter])
-        self.counter += 1
+    return data
