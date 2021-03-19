@@ -6,6 +6,7 @@ import torchvision.transforms as tfms
 import torch
 import torch.utils.data as data
 from src.data.loader import CustomTestLoader
+from src.data.loader import test_collate
 from src.model.unet import UNet
 from settings import (
     test_dir,
@@ -42,6 +43,7 @@ test_loader = data.DataLoader(
     test_dataset,
     shuffle=False,
     batch_size=batch_size,
+    collate_fn=test_collate,
     num_workers=0,
 )
 
