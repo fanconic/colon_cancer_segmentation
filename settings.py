@@ -23,9 +23,12 @@ chkpoint_file = os.path.join(model_dir, "chkpoint_")
 train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
+predictions_dir = os.path.join(data_path,'predictionsTs')
+os.mkdir(predictions_dir)
 
 num_epochs = 40
 batch_size = 1
+test_batch_size = 1
 img_size = 512
 learning_rate = 1e-3
 
