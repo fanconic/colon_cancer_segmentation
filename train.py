@@ -5,7 +5,7 @@ import torchvision
 import torchvision.transforms as tfms
 import torch
 import torch.utils.data as data
-from src.data.loader import CustomDataLoader
+from src.data.loader import CustomDataLoader, CustomValidLoader, valid_collate
 from settings import (
     train_dir,
     labels_dir,
@@ -27,7 +27,7 @@ from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
-from src.model.metrics import IoU, Threshold_IoU
+from src.model.metrics import IoU, Threshold_IoU, IoU_3D
 from sklearn.model_selection import train_test_split
 from src.utils.utils import list_files
 
@@ -65,15 +65,12 @@ train_dataset = CustomDataLoader(
     ),
 )
 
-
 # Prepare Val Data Generator
-val_dataset = CustomDataLoader(
+val_dataset = CustomValidLoader(
     train_dir,
     labels_dir,
     val_files,
     val_labels,
-    skip_blank=False,
-    shuffle=False,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -87,9 +84,10 @@ val_dataset = CustomDataLoader(
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
         ]
-    ),
+    )
 )
 
+# Create train and validation data loader
 train_loader = data.DataLoader(
     train_dataset,
     shuffle=False,
@@ -100,7 +98,8 @@ train_loader = data.DataLoader(
 val_loader = data.DataLoader(
     val_dataset,
     shuffle=False,
-    batch_size=batch_size,
+    batch_size=1,
+    collate_fn=valid_collate,
     num_workers=0,
 )
 
@@ -113,16 +112,18 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 criterion = DiceLoss()
 accuracy_metric = IoU()
 threshold_metric = Threshold_IoU()
+iou_3d = IoU_3D()
 valid_loss_min = np.Inf
 
 
 total_train_loss = []
 total_train_score = []
 total_train_score_round = []
+
 total_valid_loss = []
 total_valid_score = []
 total_valid_score_round = []
-
+total_valid_3d_score = []
 
 # vars for early stopping
 epochs_no_improve = 0
@@ -137,15 +138,15 @@ for epoch in range(num_epochs):
     train_loss = []
     train_score = []
     train_score_round = []
+
     valid_loss = []
     valid_score = []
     valid_score_round = []
+    valid_3d_score = []
 
     # <-----------Training Loop---------------------------->
     # reset the counters
     train_dataset.reset_counters()
-    val_dataset.reset_counters()
-    #pbar = tqdm(train_loader, desc="description")
     for x_train, y_train in train_loader:
         x_train = torch.autograd.Variable(x_train).cuda()
         y_train = torch.autograd.Variable(y_train).cuda()
@@ -164,11 +165,6 @@ for epoch in range(num_epochs):
         train_loss.append(losses_value)
         train_score.append(score.item())
         train_score_round.append(score_t.item())
-        """pbar.set_description(
-            "Epoch: {}, loss: {}, IoU: {}, t_IoU: {}".format(
-                epoch + 1, losses_value, score, score_t
-            )
-        )"""
 
     # <---------------Validation Loop---------------------->
     model.eval()
@@ -176,24 +172,37 @@ for epoch in range(num_epochs):
         for image, mask in val_loader:
             image = torch.autograd.Variable(image).cuda()
             mask = torch.autograd.Variable(mask).cuda()
-            output = model(image)
-            ## Compute Loss Value.
+            
+            image_split = torch.tensor_split(image, image.shape[0])
+
+            # predict 2D slices since 3D too large for GPU
+            output_ls = []
+            for split in image_split:
+                output = model(split)
+                output_ls.append(output)
+            output = torch.stack(output_ls)
+
             loss = criterion(output, mask)
             losses_value = loss.item()
             ## Compute Accuracy Score
             score = accuracy_metric(output, mask)
             score_t = threshold_metric(output, mask)
+            score_3d = iou_3d(output, mask)
             # logging
             valid_loss.append(losses_value)
             valid_score.append(score.item())
-            valid_score_round.append((score_t.item()))
+            valid_score_round.append(score_t.item())
+            valid_3d_score.append(score_3d.item())
 
     total_train_loss.append(np.mean(train_loss))
     total_train_score.append(np.mean(train_score))
+    total_train_score_round.append(np.mean(train_score_round))
+
     total_valid_loss.append(np.mean(valid_loss))
     total_valid_score.append(np.mean(valid_score))
-    total_train_score_round.append(np.mean(train_score_round))
     total_valid_score_round.append(np.mean(valid_score_round))
+    total_valid_3d_score.append(np.mean(valid_3d_score))
+
     print(
         "\n###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
             total_train_loss[-1],
@@ -204,14 +213,17 @@ for epoch in range(num_epochs):
             np.std(train_score_round),
         )
     )
+    
     print(
-        "###########Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}###########".format(
+        "###########Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
             total_valid_loss[-1],
             np.std(valid_loss),
             total_valid_score[-1],
             np.std(valid_score),
             total_valid_score_round[-1],
             np.std(valid_score_round),
+            total_valid_3d_score[-1],
+            np.std(valid_3d_score),
         )
     )
 

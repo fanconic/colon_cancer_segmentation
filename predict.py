@@ -53,7 +53,6 @@ model.eval()
 # <---------------Test Loop---------------------->
 with torch.no_grad():
     pbar = tqdm(test_loader, desc="description")
-    test_dataset.reset_counters()
     for i, image in enumerate(pbar):
         image = torch.autograd.Variable(image).cuda()
 

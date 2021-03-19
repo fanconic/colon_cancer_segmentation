@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "004"
+experiment_run = "006"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"
@@ -24,10 +24,11 @@ train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
 predictions_dir = os.path.join(data_path,'predictionsTs')
-os.mkdir(predictions_dir)
+if not os.path.exists(predictions_dir):
+    os.mkdir(predictions_dir)
 
-num_epochs = 30
-batch_size = 12
+num_epochs = 40
+batch_size = 16
 test_batch_size = 1
 img_size = 512
 learning_rate = 1e-3
@@ -43,4 +44,4 @@ seed = 1234
 with_dropout = False
 drop_prob = 0.0
 
-max_epochs_no_improve = 10
+max_epochs_no_improve = 100

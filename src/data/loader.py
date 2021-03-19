@@ -161,3 +161,63 @@ def test_collate(batch):
     data = torch.stack(list(itertools.chain(*data))).unsqueeze(1)
 
     return data
+
+
+class CustomValidLoader(data.Dataset):
+    """
+    Custom Data Loader for CT iamges, such that these can be processed directly
+    out of memory.
+    """
+
+    def __init__(
+        self,
+        root_dir,
+        seg_dir,
+        files,
+        labels,
+        transforms=None,
+        target_transforms=None,
+        skip_blank=False,
+    ):
+        self.root_dir = root_dir
+        self.seg_dir = seg_dir
+        self.transforms = transforms
+        self.target_transforms = target_transforms
+        self.files = files
+        self.lables = labels
+        print("Number of files: ", len(self.files))
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, idx):
+        img_name = self.files[idx]
+        label_name = self.lables[idx]
+        img = nib.load(os.path.join(self.root_dir, img_name)).get_fdata()
+        img = np.float32(img)
+        label = nib.load(os.path.join(self.seg_dir, label_name)).get_fdata()
+        label = np.float32(label)
+
+        if self.transforms is not None:
+            img = self.transforms(img)
+
+        if self.target_transforms is not None:
+            label = self.target_transforms(label)
+
+        return img, label
+
+
+def valid_collate(batch):
+    """
+    custom collate function for 3d images and labels of variable depth
+    Params:
+        batch: is the next batch which should be processed
+    Returns:
+        list containing the data and the target
+    """
+    data = [item[0] for item in batch]
+    data = torch.stack(list(itertools.chain(*data))).unsqueeze(1)
+    target = [item[1] for item in batch]
+    target = torch.stack(list(itertools.chain(*target)))
+
+    return [data, target]
