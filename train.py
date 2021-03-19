@@ -32,8 +32,8 @@ from sklearn.model_selection import train_test_split
 from src.utils.utils import list_files
 
 # splitting data into train and val sets
-files = list_files(train_dir)
-lables = list_files(labels_dir)
+files = sorted(list_files(train_dir))
+lables = sorted(list_files(labels_dir))
 train_files, val_files, train_labels, val_labels = train_test_split(
     files, lables, train_size=train_val_splitting_ratio, random_state=seed
 )
@@ -225,7 +225,7 @@ for epoch in range(num_epochs):
     }
 
     # save checkpoint
-    src.utils.utils.save_ckp(checkpoint, False, chkpoint_file, model_file)
+    src.utils.utils.save_ckp(checkpoint, False, chkpoint_file + "epoch_{}.pt".format(epoch+1), model_file)
 
     if total_valid_loss[-1] <= valid_loss_min:
         print(
@@ -234,13 +234,10 @@ for epoch in range(num_epochs):
             )
         )
         # save checkpoint as best model
-        src.utils.utils.save_ckp(checkpoint, False, chkpoint_file, model_file)
+        src.utils.utils.save_ckp(checkpoint, True, chkpoint_file + "epoch_{}.pt".format(epoch+1), model_file)
         valid_loss_min = total_valid_loss[-1]
 
         # keeping track of current best model (for early stopping)
-        best_current_checkpoint = checkpoint
-        best_current_checkpoint_file = chkpoint_file
-        best_current_model_file = model_file
         epochs_no_improve = 0
 
     else:
@@ -249,10 +246,4 @@ for epoch in range(num_epochs):
 
     # checking for early stopping
     if epochs_no_improve > max_epochs_no_improve:
-        # saving model as best model
-        src.utils.utils.save_ckp(
-            best_current_checkpoint,
-            True,
-            best_current_checkpoint_file,
-            best_current_model_file,
-        )
+        break

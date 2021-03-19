@@ -7,6 +7,7 @@ import torch.utils.data as data
 import itertools
 from src.utils.utils import list_files
 import sklearn.utils
+from settings import seed
 
 
 class CustomDataLoader(data.Dataset):
@@ -39,7 +40,7 @@ class CustomDataLoader(data.Dataset):
         print("Number of files: ", len(self.files))
 
         if self.shuffle:
-            files, labels = sklearn.utils.shuffle(files, labels)
+            files, labels = sklearn.utils.shuffle(files, labels, random_state=seed)
 
         # Extract the first file
         self.current_img_nib, self.current_label_nib = self.load_nibs(
@@ -102,7 +103,7 @@ class CustomDataLoader(data.Dataset):
 
         # shuffle the depth
         if self.shuffle:
-            p = np.random.permutation(img.shape[2])
+            p = np.random.RandomState(seed=seed).permutation(img.shape[2])
             img = img[:,:,p]
             label = label[:,:,p]
 
