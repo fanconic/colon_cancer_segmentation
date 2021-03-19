@@ -45,3 +45,5 @@ with_dropout = False
 drop_prob = 0.0
 
 max_epochs_no_improve = 100
+
+k_folds = 3

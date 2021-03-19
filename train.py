@@ -21,7 +21,8 @@ from settings import (
     train_val_splitting_ratio,
     seed,
     max_epochs_no_improve,
-    shuffle_files
+    shuffle_files,
+    k_folds,
 )
 from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
@@ -30,13 +31,13 @@ from src.model.losses import DiceLoss
 from src.model.metrics import IoU, Threshold_IoU, IoU_3D
 from sklearn.model_selection import train_test_split
 from src.utils.utils import list_files
+from sklearn.model_selection import KFold
 
 # splitting data into train and val sets
 files = sorted(list_files(train_dir))
 lables = sorted(list_files(labels_dir))
-train_files, val_files, train_labels, val_labels = train_test_split(
-    files, lables, train_size=train_val_splitting_ratio, random_state=seed
-)
+
+
 
 
 # Prepare Training Data Generator
