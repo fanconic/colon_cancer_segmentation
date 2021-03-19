@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "006"
+experiment_run = "8"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"

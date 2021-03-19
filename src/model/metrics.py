@@ -73,3 +73,4 @@ class IoU_3D(nn.Module):
         print(i.shape, u.shape)
 
         iou = torch.sum(i) / torch.sum(u)
+        return iou
