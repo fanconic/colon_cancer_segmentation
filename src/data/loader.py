@@ -120,6 +120,20 @@ class CustomDataLoader(data.Dataset):
             label = label[:, :, non_blanks]
             img = img[:, :, non_blanks]
 
+        if self.balance:
+            non_blanks = (label != 0).any((0, 1))
+            label_pos = label[:, :, non_blanks]
+            img_pos = img[:, :, non_blanks]
+            label_neg = label[:, :, ~non_blanks]
+            img_neg = img[:, :, ~non_blanks]
+            n_pos = label_pos.shape[2]
+            n_neg = label_neg.shape[2]
+            if n_neg > n_pos:
+                label_pos_new = np.transpose(np.array([label_pos[:,:, (i % n_pos)] for i in range(n_neg - n_pos)]), axes=(1,2,0))
+                img_pos_new = np.transpose(np.array([img_pos[:,:, (i % n_pos)] for i in range(n_neg - n_pos)]), axes=(1,2,0))
+                img = np.concatenate([img, img_pos_new], axis=2)
+                label = np.concatenate([label, label_pos_new], axis=2)
+
         # shuffle the depth
         if self.shuffle:
             p = np.random.RandomState(seed=seed).permutation(img.shape[2])
