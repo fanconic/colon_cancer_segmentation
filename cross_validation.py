@@ -58,8 +58,6 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     files_dev = [files[idx] for idx in dev_ids]
     labels_dev = [labels[idx] for idx in dev_ids]
 
-    print(files_train)
-
     # Prepare Training Data Generator
     train_dataset = CustomDataLoader(
         train_dir,
