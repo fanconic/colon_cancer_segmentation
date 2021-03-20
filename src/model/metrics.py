@@ -69,8 +69,6 @@ class IoU_3D(nn.Module):
         assert inputs.ndim==3 and targets.ndim==3
         i = (inputs==1) & (targets==1)
         u = (inputs==1) | (targets==1)
-
-        print(i.shape, u.shape)
-
+        
         iou = torch.sum(i) / torch.sum(u)
         return iou

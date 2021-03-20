@@ -26,6 +26,7 @@ class CustomDataLoader(data.Dataset):
         target_transforms=None,
         skip_blank=False,
         shuffle=False,
+        balance = False,
     ):
         self.root_dir = root_dir
         self.seg_dir = seg_dir
@@ -35,8 +36,10 @@ class CustomDataLoader(data.Dataset):
         self.labels = labels
         self.skip_blank = skip_blank
         self.shuffle = shuffle
+        self.balance = balance
         self.counter = 0
         self.index_offset = 0
+        self.length = None
         print("Number of files: ", len(self.files))
 
         if self.shuffle:
@@ -49,12 +52,28 @@ class CustomDataLoader(data.Dataset):
         self.counter += 1
 
     def __len__(self):
-        len = 0
-        for x in self.files:
-            img = nib.load(os.path.join(self.root_dir, x))
-            len += img.shape[2]
-            del img
-        return len
+        if self.length is None:
+            len = 0
+            print("Calculating Data Set, this might take a while...")
+            for x in self.files:
+                img = nib.load(os.path.join(self.seg_dir, x))
+                if self.skip_blank:
+                    img = img.get_fdata()
+                    non_blanks = (img != 0).any((0, 1))
+                    img = img[:, :, non_blanks]
+                    len += img.shape[2]
+                elif self.balance:
+                    img = img.get_fdata()
+                    non_blanks = (img == 0).any((0, 1))
+                    img = img[:, :, non_blanks]
+                    len += (img.shape[2]*2)
+                else:
+                    len += img.shape[2]
+                del img
+            self.length = len
+            return len
+        else:
+            return self.length
 
     def __getitem__(self, idx):
 

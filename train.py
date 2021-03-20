@@ -26,7 +26,7 @@ from settings import (
 from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
 import src
-from src.model.losses import DiceLoss
+from src.model.losses import DiceLoss, IoULoss
 from src.model.metrics import IoU, Threshold_IoU, IoU_3D
 from sklearn.model_selection import train_test_split
 from src.utils.utils import list_files
@@ -109,7 +109,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Training Loop
 # from engine import evaluate
-criterion = DiceLoss()
+criterion = DiceLoss() #torch.nn.BCEWithLogitsLoss(pos_weight=torch.Tensor([1000]).cuda()) 
 accuracy_metric = IoU()
 threshold_metric = Threshold_IoU()
 iou_3d = IoU_3D()
@@ -133,7 +133,11 @@ best_current_model_file = None
 
 losses_value = 0
 
-for epoch in range(num_epochs):
+epoch_start = 0
+#model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/008/bestmodel.pt', model, optimizer)
+
+
+for epoch in range(epoch_start, epoch_start + num_epochs):
     model.train()
     train_loss = []
     train_score = []
@@ -202,7 +206,8 @@ for epoch in range(num_epochs):
     total_valid_score.append(np.mean(valid_score))
     total_valid_score_round.append(np.mean(valid_score_round))
     total_valid_3d_score.append(np.mean(valid_3d_score))
-
+    
+    print("Epoch: {}".format(epoch+1))
     print(
         "\n###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
             total_train_loss[-1],
