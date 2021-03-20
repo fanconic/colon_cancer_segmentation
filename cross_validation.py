@@ -58,6 +58,8 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     files_dev = [files[idx] for idx in dev_ids]
     labels_dev = [labels[idx] for idx in dev_ids]
 
+    print(files_train)
+
     # Prepare Training Data Generator
     train_dataset = CustomDataLoader(
         train_dir,
@@ -254,6 +256,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         if total_valid_loss[-1] <= valid_loss_min:
             # keeping track of current best model (for early stopping)
             epochs_no_improve = 0
+            valid_loss_min = total_valid_loss[-1]
 
         else:
             # epoch passed without improvement
