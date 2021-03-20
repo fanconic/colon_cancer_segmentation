@@ -35,7 +35,7 @@ from sklearn.model_selection import KFold
 
 # splitting data into train and val sets
 files = sorted(list_files(train_dir))
-lables = sorted(list_files(labels_dir))
+labels = sorted(list_files(labels_dir))
 
 # K-Fold Cross Validation
 kfold = KFold(n_splits=k_folds, shuffle=True)
@@ -51,16 +51,21 @@ total_valid_3d_score = []
 
 for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     #train_sampler = torch.utils.data.SubsetRandomSampler(train_ids)
-    #dev_sampler = torch.utils.data.SubsetRandomSampler(dev_ids)    
+    #dev_sampler = torch.utils.data.SubsetRandomSampler(dev_ids)
 
-    print(train_ids)
+    files_train = [files[idx] for idx in train_ids]
+    labels_train = [labels[idx] for idx in train_ids]
+    files_dev = [files[idx] for idx in dev_ids]
+    labels_dev = [labels[idx] for idx in dev_ids]
+
+    print(files_train)
 
     # Prepare Training Data Generator
     train_dataset = CustomDataLoader(
         train_dir,
         labels_dir,
-        train_ids,
-        train_ids,
+        files_train,
+        labels_train,
         skip_blank=skip_empty,
         shuffle=shuffle_files,
         transforms=tfms.Compose(
@@ -85,8 +90,8 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     val_dataset = CustomValidLoader(
         train_dir,
         labels_dir,
-        dev_ids,
-        dev_ids,
+        files_dev,
+        labels_dev,
         transforms=tfms.Compose(
             [
                 tfms.ToTensor(),
