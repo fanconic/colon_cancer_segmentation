@@ -13,7 +13,7 @@ $ cd ML4H_project1
 
 We suggest to create a virtual environment and install the required packages.
 ```bash
-$ conda create --name experiment_env
+$ conda env create --file environment.yml
 $ conda activate project1-env
 ```
 
