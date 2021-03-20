@@ -64,9 +64,9 @@ class CustomDataLoader(data.Dataset):
                     len += img.shape[2]
                 elif self.balance:
                     img = img.get_fdata()
-                    non_blanks = (img == 0).any((0, 1))
-                    img = img[:, :, non_blanks]
-                    len += (img.shape[2]*2)
+                    non_blanks = (img != 0).any((0, 1))
+                    img = img[:, :, ~non_blanks]
+                    len += img.shape[2]*2
                 else:
                     len += img.shape[2]
                 del img

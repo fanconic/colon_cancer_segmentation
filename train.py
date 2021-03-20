@@ -21,7 +21,8 @@ from settings import (
     train_val_splitting_ratio,
     seed,
     max_epochs_no_improve,
-    shuffle_files
+    shuffle_files,
+    balance
 )
 from src.data.preprocessing import resize, normalize, torch_equalize
 from src.model.unet import UNet
@@ -47,11 +48,12 @@ train_dataset = CustomDataLoader(
     train_labels,
     skip_blank=skip_empty,
     shuffle=shuffle_files,
+    balance=balance,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomRotation(5, fill=-1024),
+            #tfms.RandomRotation(5, fill=-1024),
             tfms.Lambda(normalize),
             tfms.Lambda(torch_equalize),
         ]
@@ -60,7 +62,7 @@ train_dataset = CustomDataLoader(
         [
             tfms.ToTensor(),
             tfms.Lambda(lambda x: resize(x, size=img_size)),
-            tfms.RandomRotation(5, fill=0),
+            #tfms.RandomRotation(5, fill=0),
         ]
     ),
 )
