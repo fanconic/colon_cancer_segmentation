@@ -14,8 +14,7 @@ $ cd ML4H_project1
 We suggest to create a virtual environment and install the required packages.
 ```bash
 $ conda create --name experiment_env
-$ conda activate experiment_env
-$ conda install --file requirements.txt
+$ conda activate project1-env
 ```
 
 ### Dataset
@@ -26,6 +25,7 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 
 - `run.sh`: Script to train the U-Net on the leonhard
 - `train.py`: Main training loop in PyTorch
+- `cross-validation`: Script to elaborate on the most suited model configuration 
 - `settings.py`: Settings for paths, hyperparameters and variables
 
 ### Source Code Directory Tree
@@ -53,5 +53,6 @@ bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtota
 - Severin Husmann - shusmann@ethz.ch
 
 ## References:
+- https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/
 - https://www.kaggle.com/godeep48/simple-unet-pytorch
 
