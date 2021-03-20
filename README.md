@@ -1,5 +1,5 @@
 # Cancer Segmentation - ML4H Project1
-Project 1 one the course Machine Learning for Health Care at ETH Zürich
+Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 
 ## Setup
 
