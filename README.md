@@ -25,7 +25,7 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 
 - `run.sh`: Script to train the U-Net on the leonhard
 - `train.py`: Main training loop in PyTorch
-- `cross-validation`: Script to elaborate on the most suited model configuration 
+- `cross-validation.py`: Script to elaborate on the most suited model configuration 
 - `settings.py`: Settings for paths, hyperparameters and variables
 
 ### Source Code Directory Tree
