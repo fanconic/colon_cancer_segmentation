@@ -37,7 +37,9 @@ from sklearn.model_selection import KFold
 files = sorted(list_files(train_dir))
 lables = sorted(list_files(labels_dir))
 
-
+train_files, val_files, train_labels, val_labels = train_test_split(
+    files, lables, train_size=train_val_splitting_ratio, random_state=seed
+)
 
 
 # Prepare Training Data Generator

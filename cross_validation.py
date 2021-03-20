@@ -281,7 +281,8 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         )
 
 print(
-        "########### Mean Total Dev Score: {} ###########".format(
+        "########### Mean Total Dev Score: {}+-{} ###########".format(
                 np.mean(total_valid_3d_score),
+                np.std(total_valid_3d_score),
             )
     )
