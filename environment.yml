@@ -1,0 +1,10 @@
+# run: conda env create --file environment.yml
+
+name: project1-env
+dependencies:
+  pip:
+    - torch = 1.8.0
+    - numpy = 1.17.2
+    - nibabel = 3.2.1
+    - tqdm = 4.36.1
+    - torchvision = 0.9.0
