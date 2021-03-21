@@ -2,6 +2,7 @@ import os
 import numpy as np
 import nibabel as nib
 import cv2
+import pickle
 from tqdm import tqdm
 import torchvision
 import torchvision.transforms as tfms
@@ -53,8 +54,7 @@ model.load_state_dict(torch.load(model_file)["state_dict"])
 model.eval()
 # <---------------Test Loop---------------------->
 with torch.no_grad():
-    pbar = tqdm(test_loader, desc="description")
-    for i, image in enumerate(pbar):
+    for i, image in enumerate(test_loader):
         image = torch.autograd.Variable(image).cuda()
 
         # check that test_file[i] is equal to loaded file
@@ -64,15 +64,14 @@ with torch.no_grad():
         ).get_fdata()  # 512x512xDepth
         assert image.shape[0] == loaded_file.shape[2]
         image_split = torch.tensor_split(image, image.shape[0])
-
         # predict 2D slices since 3D too large for GPU
         output_ls = []
         for split in image_split:
             output = model(split)
-            median = cv2.medianBlur(output[0][0].cpu().numpy(), 5)
-            output = torch.Tensor([median]).cuda()
             output = torch.sigmoid(output)
             output = output.round()
+            median = cv2.medianBlur(output[0][0].cpu().numpy(), 5)
+            output = torch.Tensor([median]).cuda()
             output_ls.append(output)
 
         output = torch.stack(output_ls)
@@ -86,6 +85,6 @@ with torch.no_grad():
             pickle.dump(output, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # to test whether saving works
-        with open(prediction_filename + ".pickle", "rb") as handle:
+        with open(prediction_filename.split(".")[0] + ".pkl", "rb") as handle:
             unserialized_data = pickle.load(handle)
         assert torch.equal(output, unserialized_data)

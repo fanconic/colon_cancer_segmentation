@@ -27,7 +27,7 @@ predictions_dir = os.path.join(data_path, "predictionsTs")
 if not os.path.exists(predictions_dir):
     os.mkdir(predictions_dir)
 
-num_epochs = 10
+num_epochs = 20
 batch_size = 16
 test_batch_size = 1
 img_size = 512

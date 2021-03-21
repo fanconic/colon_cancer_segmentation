@@ -135,7 +135,7 @@ best_current_model_file = None
 losses_value = 0
 
 epoch_start = 0
-# model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/016_skip_blank_hu/chkpoint_epoch_10.pt', model, optimizer)
+model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/018_skip_almost_blank_hu/chkpoint_epoch_10.pt', model, optimizer)
 
 
 for epoch in range(epoch_start, epoch_start + num_epochs):
