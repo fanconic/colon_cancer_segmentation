@@ -14,6 +14,7 @@ from settings import (
     batch_size,
     input_channels,
     output_channels,
+    balance,
     model_file,
     chkpoint_file,
     learning_rate,
@@ -64,24 +65,23 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     train_dataset = CustomDataLoader(
         train_dir,
         labels_dir,
-        files_train,
-        labels_train,
+        train_files,
+        train_labels,
         skip_blank=skip_empty,
         shuffle=shuffle_files,
+        balance=balance,
         transforms=tfms.Compose(
             [
                 tfms.ToTensor(),
-                tfms.Lambda(lambda x: resize(x, size=img_size)),
-                tfms.RandomRotation(5, fill=-1024),
+                tfms.RandomAffine(5, scale=[1, 1.25], fill=-1024),
+                tfms.Lambda(hounsfield_clip),
                 tfms.Lambda(normalize),
-                tfms.Lambda(torch_equalize),
             ]
         ),
         target_transforms=tfms.Compose(
             [
                 tfms.ToTensor(),
-                tfms.Lambda(lambda x: resize(x, size=img_size)),
-                tfms.RandomRotation(5, fill=0),
+                tfms.RandomAffine(5, scale=[1, 1.25], fill=0),
             ]
         ),
     )
@@ -95,15 +95,13 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         transforms=tfms.Compose(
             [
                 tfms.ToTensor(),
-                tfms.Lambda(lambda x: resize(x, size=img_size)),
+                tfms.Lambda(hounsfield_clip),
                 tfms.Lambda(normalize),
-                tfms.Lambda(torch_equalize),
             ]
         ),
         target_transforms=tfms.Compose(
             [
                 tfms.ToTensor(),
-                tfms.Lambda(lambda x: resize(x, size=img_size)),
             ]
         ),
     )
