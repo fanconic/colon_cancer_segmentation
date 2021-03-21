@@ -44,7 +44,16 @@ module load eth_proxy python_gpu/3.7.4
 pip install --user nibabel
 pip install --user --upgrade torch
 pip install --user --upgrade torchvision
+```
+
+To train the model:
+```
 bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" ./run.sh
+```
+
+To predict:
+```
+bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtotal0>=10240]" ./run_predict.sh
 ```
 
 ## Contributors
