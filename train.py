@@ -7,6 +7,7 @@ import torch
 import torch.utils.data as data
 from src.data.loader import CustomDataLoader, CustomValidLoader, valid_collate
 from settings import (
+    experiment_run,
     train_dir,
     labels_dir,
     img_size,
@@ -24,7 +25,7 @@ from settings import (
     shuffle_files,
     balance
 )
-from src.data.preprocessing import resize, normalize, torch_equalize
+from src.data.preprocessing import resize, normalize, torch_equalize, hounsfield_clip
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss, IoULoss
@@ -39,6 +40,7 @@ train_files, val_files, train_labels, val_labels = train_test_split(
     files, lables, train_size=train_val_splitting_ratio, random_state=seed
 )
 
+print(experiment_run)
 
 # Prepare Training Data Generator
 train_dataset = CustomDataLoader(
@@ -52,17 +54,13 @@ train_dataset = CustomDataLoader(
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
-            tfms.Lambda(lambda x: resize(x, size=img_size)),
-            #tfms.RandomRotation(5, fill=-1024),
+            tfms.Lambda(hounsfield_clip),
             tfms.Lambda(normalize),
-            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
         [
             tfms.ToTensor(),
-            tfms.Lambda(lambda x: resize(x, size=img_size)),
-            #tfms.RandomRotation(5, fill=0),
         ]
     ),
 )
@@ -76,15 +74,13 @@ val_dataset = CustomValidLoader(
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
-            tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.Lambda(hounsfield_clip),
             tfms.Lambda(normalize),
-            tfms.Lambda(torch_equalize),
         ]
     ),
     target_transforms=tfms.Compose(
         [
             tfms.ToTensor(),
-            tfms.Lambda(lambda x: resize(x, size=img_size)),
         ]
     )
 )
@@ -111,7 +107,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 # Training Loop
 # from engine import evaluate
-criterion = DiceLoss() #torch.nn.BCEWithLogitsLoss(pos_weight=torch.Tensor([1000]).cuda()) 
+criterion = DiceLoss()
 accuracy_metric = IoU()
 threshold_metric = Threshold_IoU()
 iou_3d = IoU_3D()
@@ -187,6 +183,7 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
                 output = model(split)
                 output_ls.append(output)
             output = torch.stack(output_ls)
+            output = torch.squeeze(output)
 
             loss = criterion(output, mask)
             losses_value = loss.item()

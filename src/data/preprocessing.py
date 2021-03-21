@@ -16,6 +16,20 @@ def resize(image, size=512, mode="bilinear"):
     return F.interpolate(image.unsqueeze(0), size=(size, size), mode=mode)[0]
 
 
+def hounsfield_clip(image):
+    """
+    Clip according to the useful Hounsfield depth
+    Info taken from https://en.wikipedia.org/wiki/Hounsfield_scale
+    Params:
+        image: input image (tensor or numpy.array)
+    Returns:
+        image clipped according to Hounsfield scale
+    """
+    min_value = -60 # lower bound for fat tissue
+    max_value = 180 # upper bound of the tumour
+    return torch.clip(image, min_value, max_value)
+
+
 def normalize(image):
     """
     Normalize the image to with min-max normalization

@@ -64,7 +64,6 @@ class IoU_3D(nn.Module):
 
         # Round and squeeze
         inputs = inputs.round()
-        inputs = torch.squeeze(inputs)
 
         assert inputs.ndim==3 and targets.ndim==3
         i = (inputs==1) & (targets==1)
