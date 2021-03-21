@@ -100,7 +100,7 @@ class CustomDataLoader(data.Dataset):
         if self.target_transforms is not None:
             label = self.target_transforms(label)
 
-        return img, label
+        return img, label[0]
 
     def load_nibs(self, x_file, y_file):
         """Load a new nib file, optionally also skips all the blank labels
@@ -251,6 +251,6 @@ def valid_collate(batch):
     data = [item[0] for item in batch]
     data = torch.stack(list(itertools.chain(*data))).unsqueeze(1)
     target = [item[1] for item in batch]
-    target = torch.stack(list(itertools.chain(*target))).unsqueeze(1)
+    target = torch.stack(list(itertools.chain(*target)))
 
     return [data, target]

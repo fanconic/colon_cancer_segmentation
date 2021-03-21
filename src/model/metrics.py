@@ -63,6 +63,7 @@ class IoU_3D(nn.Module):
         inputs = torch.sigmoid(inputs)
 
         # Round and squeeze
+        inputs = torch.squeeze(inputs)
         inputs = inputs.round()
 
         assert inputs.ndim==3 and targets.ndim==3

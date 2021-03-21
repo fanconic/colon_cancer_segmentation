@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import nibabel as nib
 from tqdm import tqdm
 import torchvision
 import torchvision.transforms as tfms
@@ -17,7 +18,7 @@ from settings import (
     chkpoint_file,
     seed,
 )
-from src.data.preprocessing import resize, normalize, torch_equalize
+from src.data.preprocessing import normalize, hounsfield_clip
 import src
 from src.utils.utils import list_files
 
@@ -31,9 +32,8 @@ test_dataset = CustomTestLoader(
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
-            tfms.Lambda(lambda x: resize(x, size=img_size)),
+            tfms.Lambda(hounsfield_clip),
             tfms.Lambda(normalize),
-            tfms.Lambda(torch_equalize),
         ]
     ),
 )
@@ -42,7 +42,7 @@ test_dataset = CustomTestLoader(
 test_loader = data.DataLoader(
     test_dataset,
     shuffle=False,
-    batch_size=batch_size,
+    batch_size=test_batch_size,
     collate_fn=test_collate,
     num_workers=0,
 )

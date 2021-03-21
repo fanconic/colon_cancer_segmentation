@@ -40,6 +40,7 @@ train_files, val_files, train_labels, val_labels = train_test_split(
     files, lables, train_size=train_val_splitting_ratio, random_state=seed
 )
 
+print ("CUDA: ", torch.cuda.is_available()) 
 print(experiment_run)
 
 # Prepare Training Data Generator
@@ -54,13 +55,15 @@ train_dataset = CustomDataLoader(
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
+            tfms.RandomAffine(5, scale=[1, 1.25], fill=-1024),
             tfms.Lambda(hounsfield_clip),
             tfms.Lambda(normalize),
         ]
     ),
     target_transforms=tfms.Compose(
-        [
+        [   
             tfms.ToTensor(),
+            tfms.RandomAffine(5, scale=[1, 1.25], fill=0),
         ]
     ),
 )
@@ -183,7 +186,6 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
                 output = model(split)
                 output_ls.append(output)
             output = torch.stack(output_ls)
-            output = torch.squeeze(output)
 
             loss = criterion(output, mask)
             losses_value = loss.item()
