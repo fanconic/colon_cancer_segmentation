@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "017_balanced_hu"
+experiment_run = "018_skip_almost_blank_hu"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"
@@ -33,8 +33,8 @@ test_batch_size = 1
 img_size = 512
 learning_rate = 1e-3
 
-skip_empty = False
-balance = True
+skip_empty = True
+balance = False
 shuffle_files = True
 input_channels = 1
 output_channels = 1

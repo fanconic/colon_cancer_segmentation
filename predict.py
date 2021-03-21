@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import nibabel as nib
+import cv2
 from tqdm import tqdm
 import torchvision
 import torchvision.transforms as tfms
@@ -65,10 +66,12 @@ with torch.no_grad():
         # predict 2D slices since 3D too large for GPU
         output_ls = []
         for split in image_split:
-          output = model(split)
-          output = torch.sigmoid(output)
-          output = output.round()
-          output_ls.append(output)
+            output = model(split)
+            median = cv2.medianBlur(output[0][0].cpu().numpy(), 5)
+            output = torch.Tensor([median]).cuda()
+            output = torch.sigmoid(output)
+            output = output.round()
+            output_ls.append(output)
         
         output = torch.stack(output_ls)
         output = torch.squeeze(output) # reducing from depth x 1 x 1 x height x width

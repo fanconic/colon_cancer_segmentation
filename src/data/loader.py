@@ -61,7 +61,7 @@ class CustomDataLoader(data.Dataset):
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
                     img = img[:, :, non_blanks]
-                    len += img.shape[2]
+                    len += img.shape[2]+10
                 elif self.balance:
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
@@ -116,9 +116,19 @@ class CustomDataLoader(data.Dataset):
 
         # Only use depth channels which contain a positive label
         if self.skip_blank:
+            if self.shuffle:
+                p = np.random.RandomState(seed=seed).permutation(img.shape[2])
+                img = img[:,:,p]
+                label = label[:,:,p]
+
             non_blanks = (label != 0).any((0, 1))
-            label = label[:, :, non_blanks]
-            img = img[:, :, non_blanks]
+            label_pos = label[:, :, non_blanks]
+            img_pos = img[:, :, non_blanks]
+            label_neg = label[:, :, ~non_blanks]
+            img_neg = img[:, :, ~non_blanks]
+
+            img = np.concatenate([img_neg[:,:,:10], img_pos], axis=2)
+            label = np.concatenate([label_neg[:,:,:10], label_pos], axis=2)
 
         if self.balance:
             non_blanks = (label != 0).any((0, 1))
