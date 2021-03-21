@@ -81,7 +81,7 @@ with torch.no_grad():
         prediction_filename = os.path.join(
             predictions_dir, "prediction_" + test_files[i]
         )
-        with open(prediction_filename + ".pickle", "wb") as handle:
+        with open(prediction_filename.split(".")[0] + ".pkl", "wb") as handle:
             pickle.dump(output, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # to test whether saving works
