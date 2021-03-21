@@ -37,13 +37,13 @@ class Threshold_IoU(nn.Module):
         inputs = torch.sigmoid(inputs)
 
         # flatten label and prediction tensors
-        
+
         inputs = inputs.view(-1)
         inputs = inputs.round()  # Outputs are rounded to 0 or 1
         targets = targets.view(-1)
 
-        i = (inputs==1) & (targets==1)
-        u = (inputs==1) | (targets==1)
+        i = (inputs == 1) & (targets == 1)
+        u = (inputs == 1) | (targets == 1)
 
         nominator = torch.sum(i) + smooth
         denominator = torch.sum(u) + smooth
@@ -66,9 +66,9 @@ class IoU_3D(nn.Module):
         inputs = torch.squeeze(inputs)
         inputs = inputs.round()
 
-        assert inputs.ndim==3 and targets.ndim==3
-        i = (inputs==1) & (targets==1)
-        u = (inputs==1) | (targets==1)
-        
+        assert inputs.ndim == 3 and targets.ndim == 3
+        i = (inputs == 1) & (targets == 1)
+        u = (inputs == 1) | (targets == 1)
+
         iou = torch.sum(i) / torch.sum(u)
         return iou

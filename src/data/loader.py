@@ -26,7 +26,7 @@ class CustomDataLoader(data.Dataset):
         target_transforms=None,
         skip_blank=False,
         shuffle=False,
-        balance = False,
+        balance=False,
     ):
         self.root_dir = root_dir
         self.seg_dir = seg_dir
@@ -61,12 +61,12 @@ class CustomDataLoader(data.Dataset):
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
                     img = img[:, :, non_blanks]
-                    len += img.shape[2]+10
+                    len += img.shape[2] + 10
                 elif self.balance:
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
                     img = img[:, :, ~non_blanks]
-                    len += img.shape[2]*2
+                    len += img.shape[2] * 2
                 else:
                     len += img.shape[2]
                 del img
@@ -114,12 +114,13 @@ class CustomDataLoader(data.Dataset):
         label = nib.load(os.path.join(self.seg_dir, y_file)).get_fdata()
         label = np.float32(label)
 
-        # Only use depth channels which contain a positive label
+        # Only use depth channels which contain a positive label and 10 negative ones.
+        # downsample negatives
         if self.skip_blank:
             if self.shuffle:
                 p = np.random.RandomState(seed=seed).permutation(img.shape[2])
-                img = img[:,:,p]
-                label = label[:,:,p]
+                img = img[:, :, p]
+                label = label[:, :, p]
 
             non_blanks = (label != 0).any((0, 1))
             label_pos = label[:, :, non_blanks]
@@ -127,9 +128,10 @@ class CustomDataLoader(data.Dataset):
             label_neg = label[:, :, ~non_blanks]
             img_neg = img[:, :, ~non_blanks]
 
-            img = np.concatenate([img_neg[:,:,:10], img_pos], axis=2)
-            label = np.concatenate([label_neg[:,:,:10], label_pos], axis=2)
+            img = np.concatenate([img_neg[:, :, :10], img_pos], axis=2)
+            label = np.concatenate([label_neg[:, :, :10], label_pos], axis=2)
 
+        # Upsample positives
         if self.balance:
             non_blanks = (label != 0).any((0, 1))
             label_pos = label[:, :, non_blanks]
@@ -139,16 +141,26 @@ class CustomDataLoader(data.Dataset):
             n_pos = label_pos.shape[2]
             n_neg = label_neg.shape[2]
             if n_neg > n_pos:
-                label_pos_new = np.transpose(np.array([label_pos[:,:, (i % n_pos)] for i in range(n_neg - n_pos)]), axes=(1,2,0))
-                img_pos_new = np.transpose(np.array([img_pos[:,:, (i % n_pos)] for i in range(n_neg - n_pos)]), axes=(1,2,0))
+                label_pos_new = np.transpose(
+                    np.array(
+                        [label_pos[:, :, (i % n_pos)] for i in range(n_neg - n_pos)]
+                    ),
+                    axes=(1, 2, 0),
+                )
+                img_pos_new = np.transpose(
+                    np.array(
+                        [img_pos[:, :, (i % n_pos)] for i in range(n_neg - n_pos)]
+                    ),
+                    axes=(1, 2, 0),
+                )
                 img = np.concatenate([img, img_pos_new], axis=2)
                 label = np.concatenate([label, label_pos_new], axis=2)
 
         # shuffle the depth
         if self.shuffle:
             p = np.random.RandomState(seed=seed).permutation(img.shape[2])
-            img = img[:,:,p]
-            label = label[:,:,p]
+            img = img[:, :, p]
+            label = label[:, :, p]
 
         return img, label
 
@@ -191,6 +203,7 @@ class CustomTestLoader(data.Dataset):
             img = self.transforms(img)
 
         return img
+
 
 def test_collate(batch):
     """

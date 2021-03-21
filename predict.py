@@ -59,10 +59,12 @@ with torch.no_grad():
 
         # check that test_file[i] is equal to loaded file
         img_name = test_files[i]
-        loaded_file = nib.load(os.path.join(test_dir, img_name)).get_fdata() # 512x512xDepth
+        loaded_file = nib.load(
+            os.path.join(test_dir, img_name)
+        ).get_fdata()  # 512x512xDepth
         assert image.shape[0] == loaded_file.shape[2]
         image_split = torch.tensor_split(image, image.shape[0])
-        
+
         # predict 2D slices since 3D too large for GPU
         output_ls = []
         for split in image_split:
@@ -72,16 +74,18 @@ with torch.no_grad():
             output = torch.sigmoid(output)
             output = output.round()
             output_ls.append(output)
-        
+
         output = torch.stack(output_ls)
-        output = torch.squeeze(output) # reducing from depth x 1 x 1 x height x width
+        output = torch.squeeze(output)  # reducing from depth x 1 x 1 x height x width
 
         # save images
-        prediction_filename = os.path.join(predictions_dir, 'prediction_' + test_files[i])
-        with open(prediction_filename + '.pickle', 'wb') as handle:
+        prediction_filename = os.path.join(
+            predictions_dir, "prediction_" + test_files[i]
+        )
+        with open(prediction_filename + ".pickle", "wb") as handle:
             pickle.dump(output, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # to test whether saving works
-        with open(prediction_filename + '.pickle', 'rb') as handle:
+        with open(prediction_filename + ".pickle", "rb") as handle:
             unserialized_data = pickle.load(handle)
         assert torch.equal(output, unserialized_data)

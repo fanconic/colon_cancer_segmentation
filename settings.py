@@ -23,7 +23,7 @@ chkpoint_file = os.path.join(model_dir, "chkpoint_")
 train_dir = os.path.join(data_path, "imagesTr")
 labels_dir = os.path.join(data_path, "labelsTr")
 test_dir = os.path.join(data_path, "imagesTs")
-predictions_dir = os.path.join(data_path,'predictionsTs')
+predictions_dir = os.path.join(data_path, "predictionsTs")
 if not os.path.exists(predictions_dir):
     os.mkdir(predictions_dir)
 

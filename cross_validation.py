@@ -50,8 +50,8 @@ total_valid_score_round = []
 total_valid_3d_score = []
 
 for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
-    #train_sampler = torch.utils.data.SubsetRandomSampler(train_ids)
-    #dev_sampler = torch.utils.data.SubsetRandomSampler(dev_ids)
+    # train_sampler = torch.utils.data.SubsetRandomSampler(train_ids)
+    # dev_sampler = torch.utils.data.SubsetRandomSampler(dev_ids)
 
     files_train = [files[idx] for idx in train_ids]
     labels_train = [labels[idx] for idx in train_ids]
@@ -105,7 +105,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
                 tfms.ToTensor(),
                 tfms.Lambda(lambda x: resize(x, size=img_size)),
             ]
-        )
+        ),
     )
 
     # Create train and validation data loader
@@ -135,7 +135,6 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     threshold_metric = Threshold_IoU()
     iou_3d = IoU_3D()
     valid_loss_min = np.Inf
-
 
     # vars for early stopping
     epochs_no_improve = 0
@@ -184,7 +183,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
             for image, mask in val_loader:
                 image = torch.autograd.Variable(image).cuda()
                 mask = torch.autograd.Variable(mask).cuda()
-                
+
                 image_split = torch.tensor_split(image, image.shape[0])
 
                 # predict 2D slices since 3D too large for GPU
@@ -251,7 +250,12 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         }
 
         # save checkpoint
-        src.utils.utils.save_ckp(checkpoint, False, chkpoint_file + "epoch_{}.pt".format(epoch+1), model_file)
+        src.utils.utils.save_ckp(
+            checkpoint,
+            False,
+            chkpoint_file + "epoch_{}.pt".format(epoch + 1),
+            model_file,
+        )
 
         if total_valid_loss[-1] <= valid_loss_min:
             # keeping track of current best model (for early stopping)
@@ -267,23 +271,23 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
             break
 
     print(
-            "###########Fold: {}, Valid Loss Min: {}, Valid Loss {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
-                fold,
-                valid_loss_min,
-                total_valid_loss[-1],
-                np.std(valid_loss),
-                total_valid_score[-1],
-                np.std(valid_score),
-                total_valid_score_round[-1],
-                np.std(valid_score_round),
-                total_valid_3d_score[-1],
-                np.std(valid_3d_score),
-            )
+        "###########Fold: {}, Valid Loss Min: {}, Valid Loss {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
+            fold,
+            valid_loss_min,
+            total_valid_loss[-1],
+            np.std(valid_loss),
+            total_valid_score[-1],
+            np.std(valid_score),
+            total_valid_score_round[-1],
+            np.std(valid_score_round),
+            total_valid_3d_score[-1],
+            np.std(valid_3d_score),
         )
+    )
 
 print(
-        "########### Mean Total Dev Score: {}+-{} ###########".format(
-                np.mean(total_valid_3d_score),
-                np.std(total_valid_3d_score),
-            )
+    "########### Mean Total Dev Score: {}+-{} ###########".format(
+        np.mean(total_valid_3d_score),
+        np.std(total_valid_3d_score),
     )
+)

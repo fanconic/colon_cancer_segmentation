@@ -23,7 +23,7 @@ from settings import (
     seed,
     max_epochs_no_improve,
     shuffle_files,
-    balance
+    balance,
 )
 from src.data.preprocessing import resize, normalize, torch_equalize, hounsfield_clip
 from src.model.unet import UNet
@@ -40,7 +40,7 @@ train_files, val_files, train_labels, val_labels = train_test_split(
     files, lables, train_size=train_val_splitting_ratio, random_state=seed
 )
 
-print ("CUDA: ", torch.cuda.is_available()) 
+print("CUDA: ", torch.cuda.is_available())
 print(experiment_run)
 
 # Prepare Training Data Generator
@@ -61,7 +61,7 @@ train_dataset = CustomDataLoader(
         ]
     ),
     target_transforms=tfms.Compose(
-        [   
+        [
             tfms.ToTensor(),
             tfms.RandomAffine(5, scale=[1, 1.25], fill=0),
         ]
@@ -85,7 +85,7 @@ val_dataset = CustomValidLoader(
         [
             tfms.ToTensor(),
         ]
-    )
+    ),
 )
 
 # Create train and validation data loader
@@ -135,7 +135,7 @@ best_current_model_file = None
 losses_value = 0
 
 epoch_start = 0
-#model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/016_skip_blank_hu/chkpoint_epoch_10.pt', model, optimizer)
+# model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/016_skip_blank_hu/chkpoint_epoch_10.pt', model, optimizer)
 
 
 for epoch in range(epoch_start, epoch_start + num_epochs):
@@ -177,7 +177,7 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
         for image, mask in val_loader:
             image = torch.autograd.Variable(image).cuda()
             mask = torch.autograd.Variable(mask).cuda()
-            
+
             image_split = torch.tensor_split(image, image.shape[0])
 
             # predict 2D slices since 3D too large for GPU
@@ -207,8 +207,8 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
     total_valid_score.append(np.mean(valid_score))
     total_valid_score_round.append(np.mean(valid_score_round))
     total_valid_3d_score.append(np.mean(valid_3d_score))
-    
-    print("Epoch: {}".format(epoch+1))
+
+    print("Epoch: {}".format(epoch + 1))
     print(
         "\n###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
             total_train_loss[-1],
@@ -243,7 +243,9 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
     }
 
     # save checkpoint
-    src.utils.utils.save_ckp(checkpoint, False, chkpoint_file + "epoch_{}.pt".format(epoch+1), model_file)
+    src.utils.utils.save_ckp(
+        checkpoint, False, chkpoint_file + "epoch_{}.pt".format(epoch + 1), model_file
+    )
 
     if total_valid_loss[-1] <= valid_loss_min:
         print(
@@ -252,7 +254,12 @@ for epoch in range(epoch_start, epoch_start + num_epochs):
             )
         )
         # save checkpoint as best model
-        src.utils.utils.save_ckp(checkpoint, True, chkpoint_file + "epoch_{}.pt".format(epoch+1), model_file)
+        src.utils.utils.save_ckp(
+            checkpoint,
+            True,
+            chkpoint_file + "epoch_{}.pt".format(epoch + 1),
+            model_file,
+        )
         valid_loss_min = total_valid_loss[-1]
 
         # keeping track of current best model (for early stopping)

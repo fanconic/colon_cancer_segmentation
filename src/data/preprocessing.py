@@ -25,8 +25,8 @@ def hounsfield_clip(image):
     Returns:
         image clipped according to Hounsfield scale
     """
-    min_value = -60 # lower bound for fat tissue
-    max_value = 180 # upper bound of the tumour
+    min_value = -60  # lower bound for fat tissue
+    max_value = 180  # upper bound of the tumour
     return torch.clip(image, min_value, max_value)
 
 
