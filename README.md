@@ -27,17 +27,19 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 
 ### Repository Structure
 
-- `run.sh`: Script to train the U-Net on the leonhard
 - `train.py`: Main training loop in PyTorch
+- `predict.py`: Prediction script
 - `cross-validation.py`: Script to elaborate on the most suited model configuration 
 - `settings.py`: Settings for paths, hyperparameters and variables
+- `run.sh`: Script to train the U-Net on Leonhard
+- `run_predict.sh`: Run the prediction script on Leonhard
 
 ### Source Code Directory Tree
 ```
 .
 └── src                 # Source code for the experiments
     ├── data                # Data setup, preprocessing, augmentation 
-    ├── models              # UNet and various features of it
+    ├── models              # U-Net and various features of it
     └── utils               # Helpers
 ```
 
@@ -72,4 +74,5 @@ The predictions for the given testing set (e.g. colon_{ID}.nii) are stored as pi
 ## References:
 - https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/
 - https://www.kaggle.com/godeep48/simple-unet-pytorch
+- https://en.wikipedia.org/wiki/Hounsfield_scale
 
