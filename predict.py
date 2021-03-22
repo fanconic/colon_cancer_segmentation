@@ -119,12 +119,12 @@ with torch.no_grad():
                 output = torch.sigmoid(output)
             output = output.round().type(torch.uint8)
             median = cv2.medianBlur(output[0][0].cpu().numpy(), 11)
-            output = torch.Tensor([median]).cuda()
+            output = torch.Tensor([median])
             output_ls.append(output)
 
         output = torch.stack(output_ls)
         output = torch.squeeze(output)  # reducing from depth x 1 x 1 x height x width
-        output = output.permute(1, 2, 0) # rearranging to height x width x depth
+        output = output.permute(1, 2, 0).numpy() # rearranging to height x width x depth
 
         # save images
         prediction_filename = os.path.join(
