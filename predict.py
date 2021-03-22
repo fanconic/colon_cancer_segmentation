@@ -117,13 +117,14 @@ with torch.no_grad():
             else:
                 output = model(split)
                 output = torch.sigmoid(output)
-            output = output.round()
-            median = cv2.medianBlur(output[0][0].cpu().numpy(), 5)
+            output = output.round().type(torch.uint8)
+            median = cv2.medianBlur(output[0][0].cpu().numpy(), 11)
             output = torch.Tensor([median]).cuda()
             output_ls.append(output)
 
         output = torch.stack(output_ls)
         output = torch.squeeze(output)  # reducing from depth x 1 x 1 x height x width
+        output = output.permute(1, 2, 0) # rearranging to height x width x depth
 
         # save images
         prediction_filename = os.path.join(
@@ -131,8 +132,3 @@ with torch.no_grad():
         )
         with open(prediction_filename.split(".")[0] + ".pkl", "wb") as handle:
             pickle.dump(output, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        # to test whether saving works
-        with open(prediction_filename.split(".")[0] + ".pkl", "rb") as handle:
-            unserialized_data = pickle.load(handle)
-        assert torch.equal(output, unserialized_data)
