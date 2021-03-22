@@ -24,9 +24,9 @@ class CustomDataLoader(data.Dataset):
         labels,
         transforms=None,
         target_transforms=None,
-        skip_blank=False,
+        downsample=False, # use all positive images, and some negative ones
+        upsample=False, # use repeat positive samples until balanced
         shuffle=False,
-        balance=False,
     ):
         self.root_dir = root_dir
         self.seg_dir = seg_dir
@@ -34,9 +34,9 @@ class CustomDataLoader(data.Dataset):
         self.target_transforms = target_transforms
         self.files = files
         self.labels = labels
-        self.skip_blank = skip_blank
+        self.downsample = downsample
+        self.upsample = upsample
         self.shuffle = shuffle
-        self.balance = balance
         self.counter = 0
         self.index_offset = 0
         self.length = None
@@ -57,12 +57,12 @@ class CustomDataLoader(data.Dataset):
             print("Calculating Data Set, this might take a while...")
             for x in self.files:
                 img = nib.load(os.path.join(self.seg_dir, x))
-                if self.skip_blank:
+                if self.downsample:
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
                     img = img[:, :, non_blanks]
                     len += img.shape[2] + 10
-                elif self.balance:
+                elif self.upsample:
                     img = img.get_fdata()
                     non_blanks = (img != 0).any((0, 1))
                     img = img[:, :, ~non_blanks]
@@ -116,7 +116,7 @@ class CustomDataLoader(data.Dataset):
 
         # Only use depth channels which contain a positive label and 10 negative ones.
         # downsample negatives
-        if self.skip_blank:
+        if self.downsample:
             if self.shuffle:
                 p = np.random.RandomState(seed=seed).permutation(img.shape[2])
                 img = img[:, :, p]
@@ -132,7 +132,7 @@ class CustomDataLoader(data.Dataset):
             label = np.concatenate([label_neg[:, :, :10], label_pos], axis=2)
 
         # Upsample positives
-        if self.balance:
+        if self.upsample:
             non_blanks = (label != 0).any((0, 1))
             label_pos = label[:, :, non_blanks]
             img_pos = img[:, :, non_blanks]
@@ -233,7 +233,6 @@ class CustomValidLoader(data.Dataset):
         labels,
         transforms=None,
         target_transforms=None,
-        skip_blank=False,
     ):
         self.root_dir = root_dir
         self.seg_dir = seg_dir

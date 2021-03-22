@@ -11,7 +11,6 @@ from settings import (
     train_dir,
     labels_dir,
     img_size,
-    skip_empty,
     batch_size,
     input_channels,
     output_channels,
@@ -23,7 +22,8 @@ from settings import (
     seed,
     max_epochs_no_improve,
     shuffle_files,
-    balance,
+    upsample,
+    downsample,
 )
 from src.data.preprocessing import resize, normalize, torch_equalize, hounsfield_clip
 from src.model.unet import UNet
@@ -49,9 +49,9 @@ train_dataset = CustomDataLoader(
     labels_dir,
     train_files,
     train_labels,
-    skip_blank=skip_empty,
+    downsample=downsample,
+    upsample=upsample,
     shuffle=shuffle_files,
-    balance=balance,
     transforms=tfms.Compose(
         [
             tfms.ToTensor(),
@@ -135,7 +135,9 @@ best_current_model_file = None
 losses_value = 0
 
 epoch_start = 0
-# model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp('/cluster/scratch/fanconic/ML4H/saved_models/018_skip_almost_blank_hu/bestmodel.pt', model, optimizer)
+
+# uncomment if you wish to continue training
+# model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp(model_file, model, optimizer)
 
 
 for epoch in range(epoch_start, epoch_start + num_epochs):

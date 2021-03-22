@@ -33,8 +33,8 @@ test_batch_size = 1
 img_size = 512
 learning_rate = 1e-3
 
-skip_empty = True
-balance = False
+downsample = True
+upsample = False
 shuffle_files = True
 input_channels = 1
 output_channels = 1
