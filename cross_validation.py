@@ -50,16 +50,14 @@ total_valid_score = []
 total_valid_score_round = []
 total_valid_3d_score = []
 
+# K-fold iteration loop
 for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
-    # train_sampler = torch.utils.data.SubsetRandomSampler(train_ids)
-    # dev_sampler = torch.utils.data.SubsetRandomSampler(dev_ids)
 
+    #retrieving file names
     files_train = [files[idx] for idx in train_ids]
     labels_train = [labels[idx] for idx in train_ids]
     files_dev = [files[idx] for idx in dev_ids]
     labels_dev = [labels[idx] for idx in dev_ids]
-
-    print(files_train)
 
     # Prepare Training Data Generator
     train_dataset = CustomDataLoader(
@@ -283,6 +281,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         )
     )
 
+# printing overall model performance across k-folds
 print(
     "########### Mean Total Dev Score: {}+-{} ###########".format(
         np.mean(total_valid_3d_score),
