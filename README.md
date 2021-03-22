@@ -2,7 +2,7 @@
 Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 
 ## Objective
-The goal of this project was to build a machine learning model that segments CT images according to pixels containing cancerous or non-cancerous tissue (i.e. masking the input as primary or background).
+The goal of this project was to build a machine learning model that segments CT scans according to pixels containing cancerous or non-cancerous tissue (i.e. masking the input as primary or background).
 
 ## Setup
 
