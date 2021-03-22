@@ -4,6 +4,8 @@ Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 ## Objective
 The goal of this project was to build a machine learning model that segments CT scans according to voxels containing cancerous or non-cancerous tissue (i.e. masking the input as primary or background).
 
+![Cancer Segmentation Example from our Model](https://github.com/fanconic/ML4H_project1/blob/main/segment_example.png)
+
 ## Setup
 
 ### Installation
