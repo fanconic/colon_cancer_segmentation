@@ -19,6 +19,14 @@ from settings import (
     model_file,
     chkpoint_file,
     seed,
+    input_channels,
+    output_channels,
+    ensemble,
+    ensemble_model_1,
+    ensemble_model_2,
+    ensemble_model_3,
+    ensemble_model_4,
+    ensemble_model_5,
 )
 from src.data.preprocessing import normalize, hounsfield_clip
 import src
@@ -49,9 +57,35 @@ test_loader = data.DataLoader(
     num_workers=0,
 )
 
-model = UNet(1, 1).cuda()
-model.load_state_dict(torch.load(model_file)["state_dict"])
-model.eval()
+if ensemble:
+    # To make prediction more stables take models from the best 5 epochs
+    # model 1
+    model_1 = UNet(input_channels, output_channels).cuda()
+    model_1.load_state_dict(torch.load(ensemble_model_1)["state_dict"])
+    model_1.eval()
+    # model 2
+    model_2 = UNet(input_channels, output_channels).cuda()
+    model_2.load_state_dict(torch.load(ensemble_model_2)["state_dict"])
+    model_2.eval()
+    # model 3
+    model_3 = UNet(input_channels, output_channels).cuda()
+    model_3.load_state_dict(torch.load(ensemble_model_3)["state_dict"])
+    model_3.eval()
+    # model 4
+    model_4 = UNet(input_channels, output_channels).cuda()
+    model_4.load_state_dict(torch.load(ensemble_model_4)["state_dict"])
+    model_4.eval()
+    # model 5
+    model_5 = UNet(input_channels, output_channels).cuda()
+    model_5.load_state_dict(torch.load(ensemble_model_5)["state_dict"])
+    model_5.eval()
+
+else:
+    # simple model prediction with the best model
+    model = UNet(input_channels, output_channels).cuda()
+    model.load_state_dict(torch.load(model_file)["state_dict"])
+    model.eval()
+
 # <---------------Test Loop---------------------->
 with torch.no_grad():
     for i, image in enumerate(test_loader):
@@ -67,8 +101,22 @@ with torch.no_grad():
         # predict 2D slices since 3D too large for GPU
         output_ls = []
         for split in image_split:
-            output = model(split)
-            output = torch.sigmoid(output)
+            if ensemble:
+                output1 = model_1(split)
+                output1 = torch.sigmoid(output1)
+                output2 = model_2(split)
+                output2 = torch.sigmoid(output2)
+                output3 = model_3(split)
+                output3 = torch.sigmoid(output3)
+                output4 = model_4(split)
+                output4 = torch.sigmoid(output4)
+                output5 = model_5(split)
+                output5 = torch.sigmoid(output5)
+                output = (output1 + output2 + output3 + output4 + output5) / 5
+
+            else:
+                output = model(split)
+                output = torch.sigmoid(output)
             output = output.round()
             median = cv2.medianBlur(output[0][0].cpu().numpy(), 5)
             output = torch.Tensor([median]).cuda()

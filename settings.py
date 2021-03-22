@@ -46,3 +46,11 @@ with_dropout = False
 drop_prob = 0.0
 
 max_epochs_no_improve = 20
+
+# Ensemble:
+ensemble = False
+ensemble_model_1 = os.path.join(model_dir, "chkpoint_epoch_26.pt")
+ensemble_model_2 = os.path.join(model_dir, "chkpoint_epoch_27.pt")
+ensemble_model_3 = os.path.join(model_dir, "chkpoint_epoch_28.pt")
+ensemble_model_4 = os.path.join(model_dir, "chkpoint_epoch_29.pt")
+ensemble_model_5 = os.path.join(model_dir, "chkpoint_epoch_46.pt")

@@ -24,8 +24,8 @@ class CustomDataLoader(data.Dataset):
         labels,
         transforms=None,
         target_transforms=None,
-        downsample=False, # use all positive images, and some negative ones
-        upsample=False, # use repeat positive samples until balanced
+        downsample=False,  # use all positive images, and some negative ones
+        upsample=False,  # use repeat positive samples until balanced
         shuffle=False,
     ):
         self.root_dir = root_dir
