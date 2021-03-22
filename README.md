@@ -16,7 +16,7 @@ $ cd ML4H_project1
 
 We suggest to create a virtual environment and install the required packages.
 ```bash
-$ conda env create test_env
+$ conda create -n test_env
 $ conda activate test_env
 $ pip install -r requirements.txt
 ```
