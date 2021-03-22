@@ -61,7 +61,7 @@ bsub -n 4 -W HH:MM -N -R "rusage[mem=8192, ngpus_excl_p=1]" -R "select[gpu_mtota
 ```
 
 ## Prediction Files
-The predictions for the given testing set (e.g. colon_ID.nii) are stored as pickle files, each containing the corresponding ID of the 3D image (e.g. prediction_colon_ID.pkl). 
+The predictions for the given testing set (e.g. colon_{ID}.nii) are stored as pickle files, each containing the corresponding ID of the 3D image (e.g. prediction_colon_{ID}.pkl). 
 
 
 ## Contributors
