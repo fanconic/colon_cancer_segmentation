@@ -1,6 +1,6 @@
 # run: conda env create --file environment.yml
 
-name: project1-env
+name: test_env
 dependencies:
   pip:
     - torch = 1.8.0

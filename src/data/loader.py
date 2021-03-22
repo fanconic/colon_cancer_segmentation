@@ -52,6 +52,11 @@ class CustomDataLoader(data.Dataset):
         self.counter += 1
 
     def __len__(self):
+        """
+        Computing the depthof the given image object
+        Returns: depth of image object
+
+        """
         if self.length is None:
             len = 0
             print("Calculating Data Set, this might take a while...")
@@ -76,6 +81,12 @@ class CustomDataLoader(data.Dataset):
             return self.length
 
     def __getitem__(self, idx):
+        """
+        Loading a new image with corresponding labels
+        Args:
+            idx: index of image
+        Returns: image object and corresponding label object
+        """
 
         # Load new file if index is out of range
         if (idx - self.index_offset) >= self.current_img_nib.shape[2]:
@@ -103,7 +114,8 @@ class CustomDataLoader(data.Dataset):
         return img, label[0]
 
     def load_nibs(self, x_file, y_file):
-        """Load a new nib file, optionally also skips all the blank labels
+        """
+        Load a new nib file, optionally also skips all the blank labels
         Args:
             x_file: path to the image
             y_file: path to mask
@@ -176,8 +188,8 @@ class CustomDataLoader(data.Dataset):
 
 class CustomTestLoader(data.Dataset):
     """
-    Custom Test Loader for CT images, such that these can be processed directly
-    out of memory.
+    Custom Test Loader for CT images, such that these can be processed directly out of memory.
+    Returns: image object
     """
 
     def __init__(
@@ -223,6 +235,7 @@ class CustomValidLoader(data.Dataset):
     """
     Custom Data Loader for CT iamges, such that these can be processed directly
     out of memory.
+    Returns: image object and corresponding label object
     """
 
     def __init__(

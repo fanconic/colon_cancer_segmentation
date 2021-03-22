@@ -8,7 +8,15 @@ class IoU(nn.Module):
         super(IoU, self).__init__()
 
     def forward(self, inputs, targets, smooth=1e-6):
-
+        """
+        Computing the IOU (Intersection over Union) as described in tutorial session
+        Args:
+            inputs: predicted classificaiton (primary, background)
+            targets: underlying truth (0,1)
+            smooth: smoothing factor
+        Returns:
+            IOU score
+        """
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
 
@@ -32,6 +40,15 @@ class Threshold_IoU(nn.Module):
         super(Threshold_IoU, self).__init__()
 
     def forward(self, inputs, targets, smooth=1e-6):
+        """
+        Computing the IOU (Intersection over Union) with rounded inputs (0,1)
+        Args:
+            inputs: predicted and rounded classificaiton (primary, background)
+            targets: underlying truth (0,1)
+            smooth: smoothing factor
+        Returns:
+            Threshold IOU score
+        """
 
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
@@ -58,7 +75,14 @@ class IoU_3D(nn.Module):
         super(IoU_3D, self).__init__()
 
     def forward(self, inputs, targets):
-
+        """
+        Computing the 3D IOU (Intersection over Union) as described on Piazza
+        Args:
+            inputs: predicted classificaiton (primary, background)
+            targets: underlying truth (0,1)
+        Returns:
+            3D IOU score
+        """
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
 

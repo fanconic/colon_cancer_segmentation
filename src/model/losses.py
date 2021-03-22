@@ -8,7 +8,15 @@ class DiceBCELoss(nn.Module):
         super(DiceBCELoss, self).__init__()
 
     def forward(self, inputs, targets, smooth=1e-6):
-
+        """
+        Computing the Dice and Binary Cross Entropy loss
+        Args:
+            inputs: predicted classificaiton (primary, background)
+            targets: underlying truth (0,1)
+            smooth: smoothing factor
+        Returns:
+            DiceBCE loss
+        """
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
 
@@ -31,7 +39,15 @@ class DiceLoss(nn.Module):
         super(DiceLoss, self).__init__()
 
     def forward(self, inputs, targets, smooth=1e-6):
-
+        """
+        Computing the Dice loss
+        Args:
+            inputs: predicted classificaiton (primary, background)
+            targets: underlying truth (0,1)
+            smooth: smoothing factor
+        Returns:
+            Dice loss
+        """
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = torch.sigmoid(inputs)
 
@@ -50,7 +66,15 @@ class IoULoss(nn.Module):
         super(IoULoss, self).__init__()
 
     def forward(self, inputs, targets, smooth=1):
-
+        """
+        Computing the IoU loss
+        Args:
+            inputs: predicted classificaiton (primary, background)
+            targets: underlying truth (0,1)
+            smooth: smoothing factor
+        Returns:
+            IoU loss
+        """
         # comment out if your model contains a sigmoid or equivalent activation layer
         inputs = F.sigmoid(inputs)
 

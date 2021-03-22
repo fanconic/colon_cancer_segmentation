@@ -42,8 +42,12 @@ def normalize(image):
 
 
 def torch_equalize(image):
-    """Implements Equalize function from PIL using PyTorch ops based on:
-    https://github.com/tensorflow/tpu/blob/master/models/official/efficientnet/autoaugment.py#L352"""
+    """
+    Implements Equalize function from PIL using PyTorch ops based on:
+    https://github.com/tensorflow/tpu/blob/master/models/official/efficientnet/autoaugment.py#L352
+    Returns:
+        scaled channels according to equalize function
+    """
 
     def scale_channel(im):
         """Scale the data in the channel to implement equalize."""

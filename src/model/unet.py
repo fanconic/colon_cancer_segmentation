@@ -11,7 +11,7 @@ class double_conv(nn.Module):
 
     def __init__(self, in_channel, out_channel):
         super(double_conv, self).__init__()
-
+        # initializing the model either with or without dropout
         if with_dropout:
             self.conv = nn.Sequential(
                 nn.Conv2d(in_channel, out_channel, 3, padding=1),
@@ -88,7 +88,14 @@ class UNet(nn.Module):
         self.up_block7 = nn.Conv2d(16, out_channel, 1)
 
     def forward(self, x):
-        # Down
+        """
+        Forward of the contructed U-net
+        Args:
+            x: input image
+        Returns:
+            image object passed through the networks with pixels classified as primary or background
+        """
+        # Down sampling
         x1 = self.down_block1(x)
         x2 = self.down_block2(x1)
         x3 = self.down_block3(x2)
@@ -96,7 +103,7 @@ class UNet(nn.Module):
         x5 = self.down_block5(x4)
         x6 = self.down_block6(x5)
         x7 = self.down_block7(x6)
-        # Up
+        # Up sampling
         x8 = self.up_block1(x7, x6)
         x9 = self.up_block2(x6, x5)
         x10 = self.up_block3(x9, x4)
