@@ -40,9 +40,9 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 ```
 .
 └── src                 # Source code for the experiments
-    ├── data                # Data setup, preprocessing, augmentation 
-    ├── models              # U-Net and various features of it
-    └── utils               # Helpers
+    ├── data                # Data loaders, preprocessing
+    ├── models              # U-Net model, metrics, losses
+    └── utils               # Helper functions
 ```
 
 
