@@ -24,8 +24,9 @@ from settings import (
     max_epochs_no_improve,
     shuffle_files,
     k_folds,
+    seed,
 )
-from src.data.preprocessing import resize, normalize, torch_equalize
+from src.data.preprocessing import resize, normalize, torch_equalize, hounsfield_clip
 from src.model.unet import UNet
 import src
 from src.model.losses import DiceLoss
@@ -39,7 +40,7 @@ files = sorted(list_files(train_dir))
 labels = sorted(list_files(labels_dir))
 
 # K-Fold Cross Validation
-kfold = KFold(n_splits=k_folds, shuffle=True)
+kfold = KFold(n_splits=k_folds, shuffle=True, random_state=seed)
 
 total_train_loss = []
 total_train_score = []
@@ -50,10 +51,12 @@ total_valid_score = []
 total_valid_score_round = []
 total_valid_3d_score = []
 
+min_ious = []
+
 # K-fold iteration loop
 for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
 
-    #retrieving file names
+    # retrieving file names
     files_train = [files[idx] for idx in train_ids]
     labels_train = [labels[idx] for idx in train_ids]
     files_dev = [files[idx] for idx in dev_ids]
@@ -63,8 +66,8 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     train_dataset = CustomDataLoader(
         train_dir,
         labels_dir,
-        train_files,
-        train_labels,
+        files_train,
+        labels_train,
         downsample=downsample,
         shuffle=shuffle_files,
         upsample=upsample,
@@ -131,6 +134,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
     threshold_metric = Threshold_IoU()
     iou_3d = IoU_3D()
     valid_loss_min = np.Inf
+    valid_iou_min = np.Inf
 
     # vars for early stopping
     epochs_no_improve = 0
@@ -210,9 +214,9 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         total_valid_score_round.append(np.mean(valid_score_round))
         total_valid_3d_score.append(np.mean(valid_3d_score))
 
+        print("\nFold:{}\tEpoch: {}".format(fold + 1, epoch + 1))
         print(
-            "\n###########Fold: {}, Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
-                fold,
+            "###########Train Loss: {}+-{}, Train IOU: {}+-{}, Train Threshold IoU: {}+-{}###########".format(
                 total_train_loss[-1],
                 np.std(train_loss),
                 total_train_score[-1],
@@ -223,8 +227,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         )
 
         print(
-            "###########Fold: {}, Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
-                fold,
+            "###########Valid Loss: {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
                 total_valid_loss[-1],
                 np.std(valid_loss),
                 total_valid_score[-1],
@@ -236,27 +239,35 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
             )
         )
 
-        # Save best model Checkpoint
-        # create checkpoint variable and add important data
-        checkpoint = {
-            "epoch": epoch + 1,
-            "valid_loss_min": total_valid_loss[-1],
-            "state_dict": model.state_dict(),
-            "optimizer": optimizer.state_dict(),
-        }
-
-        # save checkpoint
-        src.utils.utils.save_ckp(
-            checkpoint,
-            False,
-            chkpoint_file + "epoch_{}.pt".format(epoch + 1),
-            model_file,
-        )
-
         if total_valid_loss[-1] <= valid_loss_min:
+            print(
+                "Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...".format(
+                    valid_loss_min, total_valid_loss[-1]
+                )
+            )
+
+            # Save best model Checkpoint
+            # create checkpoint variable and add important data
+            checkpoint = {
+                "fold": fold + 1,
+                "epoch": epoch + 1,
+                "valid_loss_min": total_valid_loss[-1],
+                "state_dict": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+            }
+
+            # save checkpoint as best model
+            src.utils.utils.save_ckp(
+                checkpoint,
+                True,
+                chkpoint_file + "fold{}_epoch{}.pt".format(fold + 1, epoch + 1),
+                "bestmodel_fold{}.pt".format(fold + 1),
+            )
+
             # keeping track of current best model (for early stopping)
             epochs_no_improve = 0
             valid_loss_min = total_valid_loss[-1]
+            valid_iou_min = total_valid_3d_score[:-1]
 
         else:
             # epoch passed without improvement
@@ -266,25 +277,15 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
         if epochs_no_improve > max_epochs_no_improve:
             break
 
+    min_ious.append(valid_iou_min)
     print(
-        "###########Fold: {}, Valid Loss Min: {}, Valid Loss {}+-{}, Valid IOU: {}+-{}, Valid Threshold IoU: {}+-{}, Valid 3D IoU: {}+-{} ###########".format(
-            fold,
-            valid_loss_min,
-            total_valid_loss[-1],
-            np.std(valid_loss),
-            total_valid_score[-1],
-            np.std(valid_score),
-            total_valid_score_round[-1],
-            np.std(valid_score_round),
-            total_valid_3d_score[-1],
-            np.std(valid_3d_score),
+        "###########Min Valid Loss: {}, Min Valid 3D IoU: {}###########".format(
+            valid_loss_min, valid_iou_min
         )
     )
 
-# printing overall model performance across k-folds
 print(
-    "########### Mean Total Dev Score: {}+-{} ###########".format(
-        np.mean(total_valid_3d_score),
-        np.std(total_valid_3d_score),
+    "########### Average 3D IoU over folds: {}+-{}}###########".format(
+        np.mean(min_ious), np.std(min_ious)
     )
 )

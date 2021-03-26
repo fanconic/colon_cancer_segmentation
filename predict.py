@@ -124,7 +124,9 @@ with torch.no_grad():
 
         output = torch.stack(output_ls)
         output = torch.squeeze(output)  # reducing from depth x 1 x 1 x height x width
-        output = output.permute(1, 2, 0).numpy() # rearranging to height x width x depth
+        output = output.permute(
+            1, 2, 0
+        ).numpy()  # rearranging to height x width x depth
 
         # save images
         prediction_filename = os.path.join(

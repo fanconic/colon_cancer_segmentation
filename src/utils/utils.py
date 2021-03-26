@@ -18,10 +18,10 @@ def save_ckp(state, is_best, checkpoint_path, best_model_path):
     """
     Saving a certain checkpoint/model state
     Params:
-    	state: checkpoint we want to save
-    	is_best: is this the best checkpoint; min validation loss
-    	checkpoint_path: path to save checkpoint
-    	best_model_path: path to save best model
+        state: checkpoint we want to save
+        is_best: is this the best checkpoint; min validation loss
+        checkpoint_path: path to save checkpoint
+        best_model_path: path to save best model
     """
     f_path = checkpoint_path
     # save checkpoint data to the path given, checkpoint_path
@@ -37,9 +37,9 @@ def load_ckp(checkpoint_fpath, model, optimizer):
     """
     Loading a specific checkpoint/model state
     Params:
-    	checkpoint_fpath: path to saved checkpoint
-    	model: model that we want to load checkpoint parameters into
-    	optimizer: optimizer we defined in previous training
+        checkpoint_fpath: path to saved checkpoint
+        model: model that we want to load checkpoint parameters into
+        optimizer: optimizer we defined in previous training
     Returns: loaded model, loaded optimizer, epoch (int) of loaded checkpoint, minimal val loss of retrieved model
     """
     # load check point

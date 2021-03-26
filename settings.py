@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "018_skip_almost_blank_hu"
+experiment_run = "020_cross_validation_50"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"
@@ -27,7 +27,7 @@ predictions_dir = os.path.join(data_path, "predictionsTs")
 if not os.path.exists(predictions_dir):
     os.mkdir(predictions_dir)
 
-num_epochs = 20
+num_epochs = 50
 batch_size = 16
 test_batch_size = 1
 img_size = 512
@@ -45,10 +45,11 @@ seed = 1234
 with_dropout = False
 drop_prob = 0.0
 
-max_epochs_no_improve = 20
+max_epochs_no_improve = 15
+k_folds = 3
 
 # Ensemble:
-ensemble = False
+ensemble = True
 ensemble_model_1 = os.path.join(model_dir, "chkpoint_epoch_26.pt")
 ensemble_model_2 = os.path.join(model_dir, "chkpoint_epoch_27.pt")
 ensemble_model_3 = os.path.join(model_dir, "chkpoint_epoch_28.pt")

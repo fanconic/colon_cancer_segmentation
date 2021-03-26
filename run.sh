@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo 'Standard Training.'
-python -u train.py
+python -u cross_validation.py
 echo 'Script completed!'
