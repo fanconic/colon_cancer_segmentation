@@ -1,10 +1,10 @@
 # Cancer Segmentation - ML4H Project1
 Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 
-![U-Net Model](https://github.com/fanconic/ML4H_project1/blob/main/misc/unet.png =300x200)
+<img src="https://github.com/fanconic/ML4H_project1/blob/main/misc/u_net.png" width="500">
 
 ## Objective
-The goal of this project was to build a machine learning model that segments CT scans according to voxels containing cancerous or non-cancerous tissue (i.e. masking the input as primary or background). Specifically, we are looking at 3D CT scans which contain colon cancer. We implemented a U-Net architecture, with customized data loader for this image segmentation. Below find a plot of what our model does. We show a slice of the CT scan representing the input to the model, follwed by our prediction and the actual cancerous segmentation. Finally, for visualization purpose we show a mixture of the input and our prediction, as well as histogram of the prediction.
+The goal of this project was to build a machine learning model that segments CT scans according to voxels containing cancerous or non-cancerous tissue (i.e. masking the input as primary or background). Specifically, we are looking at **3D CT scans** which contain **colon cancer**. We implemented a **U-Net architecture**, with customized data loader for this image segmentation. Below find a plot of what our model does. We show a slice of the CT scan representing the input to the model, follwed by our prediction and the actual cancerous segmentation. Finally, for visualization purpose we show a mixture of the input and our prediction, as well as histogram of the prediction.
 
 ![Cancer Segmentation Example from our Model](https://github.com/fanconic/ML4H_project1/blob/main/misc/segment_example.png)
 
