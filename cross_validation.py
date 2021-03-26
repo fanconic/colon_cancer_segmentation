@@ -261,7 +261,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
                 checkpoint,
                 True,
                 chkpoint_file + "fold{}_epoch{}.pt".format(fold + 1, epoch + 1),
-                "bestmodel_fold{}.pt".format(fold + 1),
+                chkpoint_file + "bestmodel_fold{}.pt".format(fold + 1),
             )
 
             # keeping track of current best model (for early stopping)
