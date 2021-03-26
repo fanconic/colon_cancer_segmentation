@@ -44,9 +44,9 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 └── src                 # Source code for the experiments
     ├── data                # Data loaders, preprocessing
     ├── models              # U-Net model, metrics, losses
-    ├── utils               # Helper functions
-    ├── log                 # Cross validation training log
-    └── misc                # Images for README
+    └── utils               # Helper functions
+├── log                 # Cross validation training log
+└── misc                # Images for README
 ```
 
 
