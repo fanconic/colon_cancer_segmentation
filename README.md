@@ -1,4 +1,4 @@
-# Cancer Segmentation - ML4H Project1
+# Colon Cancer Segmentation - U-Net
 Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 
 <img src="https://github.com/fanconic/ML4H_project1/blob/main/misc/u_net.png" width="500">
