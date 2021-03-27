@@ -1,4 +1,4 @@
-# Cancer Segmentation - ML4H Project1
+# Colon Cancer Segmentation - U-Net
 Project 1 of the course Machine Learning for Health Care in FS21 at ETH Zürich
 
 <img src="https://github.com/fanconic/ML4H_project1/blob/main/misc/u_net.png" width="500">
@@ -44,9 +44,9 @@ Download the Dataset from https://drive.google.com/drive/folders/1Fb9RzgBPJAVFkq
 └── src                 # Source code for the experiments
     ├── data                # Data loaders, preprocessing
     ├── models              # U-Net model, metrics, losses
-    ├── utils               # Helper functions
-    ├── log                 # Cross validation training log
-    └── misc                # Images for README
+    └── utils               # Helper functions
+├── log                 # Cross validation training log
+└── misc                # Images for README
 ```
 
 
