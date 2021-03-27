@@ -25,8 +25,6 @@ from settings import (
     ensemble_model_1,
     ensemble_model_2,
     ensemble_model_3,
-    ensemble_model_4,
-    ensemble_model_5,
 )
 from src.data.preprocessing import normalize, hounsfield_clip
 import src
@@ -71,14 +69,6 @@ if ensemble:
     model_3 = UNet(input_channels, output_channels).cuda()
     model_3.load_state_dict(torch.load(ensemble_model_3)["state_dict"])
     model_3.eval()
-    # model 4
-    model_4 = UNet(input_channels, output_channels).cuda()
-    model_4.load_state_dict(torch.load(ensemble_model_4)["state_dict"])
-    model_4.eval()
-    # model 5
-    model_5 = UNet(input_channels, output_channels).cuda()
-    model_5.load_state_dict(torch.load(ensemble_model_5)["state_dict"])
-    model_5.eval()
 
 else:
     # simple model prediction with the best model
@@ -108,12 +98,7 @@ with torch.no_grad():
                 output2 = torch.sigmoid(output2)
                 output3 = model_3(split)
                 output3 = torch.sigmoid(output3)
-                output4 = model_4(split)
-                output4 = torch.sigmoid(output4)
-                output5 = model_5(split)
-                output5 = torch.sigmoid(output5)
-                output = (output1 + output2 + output3 + output4 + output5) / 5
-
+                output = (output1 + output2 + output3) / 3
             else:
                 output = model(split)
                 output = torch.sigmoid(output)

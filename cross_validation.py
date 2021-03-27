@@ -144,7 +144,9 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
 
     losses_value = 0
 
-    for epoch in range(num_epochs):
+    model, optimizer, epoch_start, valid_loss_min = src.utils.utils.load_ckp(chkpoint_file + "bestmodel_fold{}.pt".format(fold + 1), model, optimizer)
+
+    for epoch in range(epoch_start, epoch_start + num_epochs):
         model.train()
         train_loss = []
         train_score = []
@@ -267,7 +269,7 @@ for fold, (train_ids, dev_ids) in enumerate(kfold.split(files)):
             # keeping track of current best model (for early stopping)
             epochs_no_improve = 0
             valid_loss_min = total_valid_loss[-1]
-            valid_iou_min = total_valid_3d_score[:-1]
+            valid_iou_min = total_valid_3d_score[-1]
 
         else:
             # epoch passed without improvement

@@ -3,7 +3,7 @@ import getpass
 
 username = getpass.getuser()
 
-experiment_run = "020_cross_validation_50"
+experiment_run = "021_cross_validation_dropout"
 
 if "COLAB_GPU" in os.environ:
     data_path = "/content/ml4h_proj1_colon_cancer_ct/"
@@ -27,7 +27,7 @@ predictions_dir = os.path.join(data_path, "predictionsTs")
 if not os.path.exists(predictions_dir):
     os.mkdir(predictions_dir)
 
-num_epochs = 50
+num_epochs = 24
 batch_size = 16
 test_batch_size = 1
 img_size = 512
@@ -42,16 +42,25 @@ output_channels = 1
 train_val_splitting_ratio = 0.8
 seed = 1234
 
-with_dropout = False
-drop_prob = 0.0
+with_dropout = True
+drop_prob = 0.2
 
-max_epochs_no_improve = 15
+max_epochs_no_improve = 12
 k_folds = 3
 
 # Ensemble:
 ensemble = True
-ensemble_model_1 = os.path.join(model_dir, "chkpoint_epoch_26.pt")
-ensemble_model_2 = os.path.join(model_dir, "chkpoint_epoch_27.pt")
-ensemble_model_3 = os.path.join(model_dir, "chkpoint_epoch_28.pt")
-ensemble_model_4 = os.path.join(model_dir, "chkpoint_epoch_29.pt")
-ensemble_model_5 = os.path.join(model_dir, "chkpoint_epoch_46.pt")
+
+# Without Dropout
+"""
+pred_dir = os.path.join(out_dir, "020_cross_validation_50")
+ensemble_model_1 = os.path.join(pred_dir, "bestmodel_fold1.pt")
+ensemble_model_2 = os.path.join(pred_dir, "bestmodel_fold2.pt")
+ensemble_model_3 = os.path.join(pred_dir, "bestmodel_fold3.pt")
+"""
+
+# With Dropout
+pred_dir_dp = os.path.join(out_dir, "021_cross_validation_dropout")
+ensemble_model_1 = os.path.join(pred_dir_dp, "chkpoint_bestmodel_fold1.pt")
+ensemble_model_2 = os.path.join(pred_dir_dp, "chkpoint_bestmodel_fold2.pt")
+ensemble_model_3 = os.path.join(pred_dir_dp, "chkpoint_bestmodel_fold3.pt")
